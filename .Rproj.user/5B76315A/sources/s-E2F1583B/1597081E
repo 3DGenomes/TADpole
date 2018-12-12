@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1544617981247.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "30|27|36|0|\n38|58|72|0|\n74|65|107|0|\n109|41|115|0|\n",
+    "hash" : "0",
+    "id" : "1597081E",
+    "lastKnownWriteTime" : 1544623004,
+    "last_content_update" : 1544623004723,
+    "path" : "~/Dropbox/TAD_caller/htads/R/hTAD_caller.R",
+    "project_path" : "R/hTAD_caller.R",
+    "properties" : {
+        "cursorPosition" : "8,43",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
