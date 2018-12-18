@@ -28,6 +28,17 @@ require(rioja)
 require(fpc)
 require(colorRamps)
 
+reshape_mat <- function(mat){
+    matrix_GCBC1 = as.matrix(acast(mat, V1~V2, value.var="V3"))
+    matrix_GCBC1[is.na(matrix_GCBC1)] <- 0
+    mat <- symmetrize_matrix(matrix_GCBC1)
+    # mat[upper.tri(mat, diag=FALSE)] <- (mat[lower.tri(mat, diag=FALSE)])
+    M1 <- as.matrix(mat)
+    M1 <- as(mat, "dgCMatrix")
+    Matrix::forceSymmetric(M1,uplo="L")
+
+}
+
 sparse_cor <- function(x) {
   # Create a sparse correlation matrix.
   covmat <- (as.matrix(crossprod(x)) - nrow(x) * tcrossprod(colMeans(x))) / (nrow(x) - 1)
