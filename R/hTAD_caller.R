@@ -29,12 +29,11 @@ require(fpc)
 require(colorRamps)
 
 reshape_mat <- function(mat){
-    matrix_GCBC1 = as.matrix(acast(mat, V1~V2, value.var="V3"))
-    matrix_GCBC1[is.na(matrix_GCBC1)] <- 0
-    mat <- symmetrize_matrix(matrix_GCBC1)
-    # mat[upper.tri(mat, diag=FALSE)] <- (mat[lower.tri(mat, diag=FALSE)])
-    M1 <- as.matrix(mat)
-    M1 <- as(mat, "dgCMatrix")
+    matrix_format = as.matrix(acast(mat, V1~V2, value.var="V3"))
+    matrix_format[is.na(matrix_format)] <- 0
+    #mat <- symmetrize_matrix(matrix_GCBC1)
+    M1 <- as.matrix(matrix_format)
+   # M1 <- as(mat, "dgCMatrix")
     Matrix::forceSymmetric(M1,uplo="L")
 
 }
