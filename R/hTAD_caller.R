@@ -2,13 +2,13 @@
 #'
 #' This function appends state population data
 #' @param file_name The path to the file to read.
-#' @param cores The number of cores to use for parallel execution.
-#' @param n_pcs The maximum number of principal components to retain for the analysis.
-#' @param random Logical. Whether to use the fast version of the algorithm.
-#' @param n_samples When random is TRUE, the number of samples used to approximate the optimal solution.ç
-#' @param plot Logical. Whether to plot the
+#' @param cores When `method` is `accurate`, the number of cores to use for parallel execution.
+#' @param max_pcs The maximum number of principal components to retain for the analysis.
+#' @param method Which version of the algorithm to use.
+#' @param n_samples When `method` is `fast`, the number of samples used to approximate the optimal solution.ç
+#' @param plot Logical. Whether to plot the scores for every tested `n_pcs`/`n_clusters` combination.
 #' @keywords per capita
-#' @import dplyr
+#' @import colorRamps
 #' @export
 #' @examples
 #' call_hTADs("file_name.abc")
@@ -20,22 +20,20 @@
 # The :: operator adds a small overhead.
 
 # Load packages.
-require(data.table)
-require(dryhic)
-require(Matrix)
-require(doParallel)
-require(rioja)
-require(fpc)
 require(colorRamps)
+require(data.table)
+require(doParallel)
+require(fpc)
+require(Matrix)
+require(reshape2)
+require(rioja)
 
-reshape_mat <- function(mat){
-    matrix_format = as.matrix(acast(mat, V1~V2, value.var="V3"))
-    matrix_format[is.na(matrix_format)] <- 0
-    #mat <- symmetrize_matrix(matrix_GCBC1)
-    M1 <- as.matrix(matrix_format)
-   # M1 <- as(mat, "dgCMatrix")
-    Matrix::forceSymmetric(M1,uplo="L")
-
+load_mat <- function(file_name){
+    mat <- fread(file_name)
+    colnames(mat) <- paste0('V', 1:3)
+    mat <- as.matrix(acast(mat, V1 ~ V2, value.var = 'V3'))
+    mat[is.na(mat)] <- 0 # Clean NA/NaN values.
+    Matrix::forceSymmetric(mat, uplo = 'L')
 }
 
 sparse_cor <- function(x) {
@@ -58,7 +56,6 @@ find_params_accurate <- function(pca, number_pca, cores) {
     bs <- rioja::bstick(clust, nrow(pcs) - 1, plot = FALSE)
     r <- rle(bs$dispersion > bs$bstick)
     n_cluster <- r$lengths[r$values][1]
-    chc <- cutree(clust, k = n_cluster)
 
     score <- rep(NA, n_cluster)
     for (n in 2:n_cluster) {
@@ -82,12 +79,12 @@ find_params_accurate <- function(pca, number_pca, cores) {
   list(n_PCs = optimal_PCs, n_clusters = optimal_n_clusters, scores = scores)
 }
 
-find_params_fast <- function(pca, number_pca, cores, n_samples) {
+find_params_fast <- function(pca, number_pca, n_samples) {
   n_pca <- sample(number_pca, n_samples, replace = TRUE)
-  n_clu <- c()
+  n_clu <- rep(NA, n_samples)
+  calinhara_score <- list()
 
-  registerDoParallel(cores = cores)
-  calinhara_score <- foreach(i = 1:n_samples) %dopar% {
+  for (i in 1:n_samples) {
     pcs <- as.matrix(pca$x[, 1:n_pca[i]])
     row.names(pcs) <- 1:nrow(pcs)
 
@@ -97,11 +94,10 @@ find_params_fast <- function(pca, number_pca, cores, n_samples) {
     bs <- rioja::bstick(clust, nrow(pcs) - 1, plot = FALSE)
     r <- rle(bs$dispersion > bs$bstick)
     n_cluster <- r$lengths[r$values][1]
-    chc <- cutree(clust, k = n_cluster)
 
-    n_clu <<- c(n_clu, sample(2:n_cluster, 1))
-    chc <- cutree(clust, k = tail(n_clu, 1))
-    fpc::calinhara(pca$x, chc, cn = tail(n_clu, 1))
+    n_clu[i] <- sample(2:n_cluster, 1)
+    chc <- cutree(clust, k = n_clu[i])
+    calinhara_score[[i]] <- fpc::calinhara(pca$x, chc, cn = n_clu[i])
   }
 
   scores <- matrix(NA, nrow = max(n_pca), ncol = max(n_clu))
@@ -125,13 +121,9 @@ plot_scores <- function(optimal_params) {
   axis(2, at = seq(0, 1, length.out = ncol(s)), labels = colnames(s))
 }
 
-call_hTADs <- function(file_name, cores = 1, n_pcs = 200, random = FALSE, n_samples = 60, plot = FALSE) {
+call_hTADs <- function(file_name, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, plot = FALSE) {
   # Load and clean data.
-  # mat <- as.matrix(fread(file_name, drop = 1:2)) # TODO: Drop first 2 columns?
-  mat <- as.matrix(fread(file_name))
-  mat <- mat[2:293, 2:293]
-  mat <- symmetrize_matrix(mat)
-  mat[is.na(mat)] <- 0 # Clean NA/NaN values.
+  mat <- load_mat(file_name)
 
   # Sparse matrix and correlation.
   sparse_matrix <- Matrix(mat, sparse = TRUE)
@@ -139,12 +131,14 @@ call_hTADs <- function(file_name, cores = 1, n_pcs = 200, random = FALSE, n_samp
   correlation_matrix[is.na(correlation_matrix)] <- 0 # Clean NA/NaN values.
 
   # PCA (compute first `n.pcs` components).
-  number_pca <- min(n_pcs, nrow(mat))
+  number_pca <- min(max_pcs, nrow(mat))
   pca <- prcomp(correlation_matrix, rank. = number_pca)
 
   # Find optimal clustering parameters based on Calinhara score.
-  if (random) optimal_params <- find_params_fast(pca, number_pca, cores, n_samples)
-  else optimal_params <- find_params_accurate(pca, number_pca, cores)
+  method <- match.arg(method)
+  optimal_params <- switch(method,
+                           fast = find_params_fast(pca, number_pca, n_samples),
+                           accurate = find_params_accurate(pca, number_pca, cores))
 
   # Plot nPCs vs nClusters Calinhara score.
   if (plot) plot_scores(optimal_params)
