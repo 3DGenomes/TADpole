@@ -17,3 +17,4 @@ Imports:
   fpc,
   Matrix,
   rioja
+RoxygenNote: 6.1.1

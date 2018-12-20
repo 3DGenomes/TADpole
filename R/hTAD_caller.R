@@ -1,32 +1,14 @@
-#' Population adjuster
-#'
-#' This function appends state population data
-#' @param file_name The path to the file to read.
-#' @param cores When `method` is `accurate`, the number of cores to use for parallel execution.
-#' @param max_pcs The maximum number of principal components to retain for the analysis.
-#' @param method Which version of the algorithm to use.
-#' @param n_samples When `method` is `fast`, the number of samples used to approximate the optimal solution.ç
-#' @param plot Logical. Whether to plot the scores for every tested `n_pcs`/`n_clusters` combination.
-#' @keywords per capita
-#' @import colorRamps
-#' @export
-#' @examples
-#' call_hTADs("file_name.abc")
-
-# TODO: either create one file per function (nice). Or one docstring just before each function.
-# I understand only exported functions in NAMESPACE are to have docs (maybe only call_hTADs).
-
 # TODO: refer to external functions as package::function(args)
 # The :: operator adds a small overhead.
 
 # Load packages.
-require(colorRamps)
-require(data.table)
-require(doParallel)
-require(fpc)
-require(Matrix)
-require(reshape2)
-require(rioja)
+library(colorRamps)
+library(data.table)
+library(doParallel)
+library(fpc)
+library(Matrix)
+library(reshape2)
+library(rioja)
 
 load_mat <- function(file_name){
     mat <- fread(file_name)
@@ -120,6 +102,26 @@ plot_scores <- function(optimal_params) {
   axis(1, at = seq(0, 1, length.out = nrow(s)), labels = rownames(s))
   axis(2, at = seq(0, 1, length.out = ncol(s)), labels = colnames(s))
 }
+
+#' Call hierarchical TADs
+#'
+#' Computes a constrained hierarchical clustering of genomic regions in a HiC experiment,
+#' choosing the optimal amount of information from the HiC matrix and selecting the most informative number of TADs.
+#' @param file_name The path to the file to read.
+#' @param cores When `method` is `accurate`, the number of cores to use for parallel execution.
+#' @param max_pcs The maximum number of principal components to retain for the analysis.
+#' @param method Which version of the algorithm to use.
+#' @param n_samples When `method` is `fast`, the number of samples used to approximate the optimal solution.ç
+#' @param plot Logical. Whether to plot the scores for every tested `n_pcs`/`n_clusters` combination.
+#' @return `htad` object that specifies the clustering of genomic regions.
+#' @keywords per capita
+#' @import colorRamps
+#' @export
+#' @examples
+#' htads <- call_hTADs("file_name.abc")
+
+# TODO: either create one file per function (nice). Or one docstring just before each function.
+# I understand only exported functions in NAMESPACE are to have docs (maybe only call_hTADs).
 
 call_hTADs <- function(file_name, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, plot = FALSE) {
   # Load and clean data.
