@@ -40,7 +40,7 @@ find_params_accurate <- function(pca, number_pca, cores) {
     n_cluster <- r$lengths[r$values][1]
 
     score <- rep(NA, n_cluster)
-    for (n in 2:n_cluster) {
+    for (n in 1:n_cluster) {
       chc <- cutree(clust, k = n)
       score[n] <- fpc::calinhara(pca$x, chc, cn = n)
     }
@@ -77,7 +77,7 @@ find_params_fast <- function(pca, number_pca, n_samples) {
     r <- rle(bs$dispersion > bs$bstick)
     n_cluster <- r$lengths[r$values][1]
 
-    n_clu[i] <- sample(2:n_cluster, 1)
+    n_clu[i] <- sample(1:n_cluster, 1)
     chc <- cutree(clust, k = n_clu[i])
     calinhara_score[[i]] <- fpc::calinhara(pca$x, chc, cn = n_clu[i])
   }
