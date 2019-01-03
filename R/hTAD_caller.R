@@ -2,18 +2,18 @@
 # The :: operator adds a small overhead.
 
 # Load packages.
-library(colorRamps)
-library(data.table)
-library(doParallel)
-library(fpc)
-library(Matrix)
-library(reshape2)
-library(rioja)
+# library(colorRamps)
+# library(data.table)
+# library(doParallel)
+# library(fpc)
+# library(Matrix)
+# library(reshape2)
+# library(rioja)
 
 load_mat <- function(file_name){
-    mat <- fread(file_name)
+    mat <- data.table::fread(file_name)
     colnames(mat) <- paste0('V', 1:3)
-    mat <- as.matrix(acast(mat, V1 ~ V2, value.var = 'V3'))
+    mat <- as.matrix(reshape2::acast(mat, V1 ~ V2, value.var = 'V3'))
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
     Matrix::forceSymmetric(mat, uplo = 'L')
 }
@@ -27,8 +27,8 @@ sparse_cor <- function(x) {
 }
 
 find_params_accurate <- function(pca, number_pca, cores) {
-  registerDoParallel(cores = cores)
-  calinhara_score <- foreach(i = 1:number_pca) %dopar% {
+  doParallel::registerDoParallel(cores = cores)
+  calinhara_score <- foreach::foreach(i = 1:number_pca) %dopar% {
     pcs <- as.matrix(pca$x[, 1:i])
     row.names(pcs) <- 1:nrow(pcs)
 
@@ -98,7 +98,7 @@ find_params_fast <- function(pca, number_pca, n_samples) {
 plot_scores <- function(optimal_params) {
   # Plot nPCs vs nClusters CHi.
   s <- optimal_params$scores
-  image(s, col = green2red(1024), xaxt = 'n', yaxt = 'n', xlab = '# PCs', ylab = '# clusters')
+  image(s, col = colorRamps::green2red(1024), xaxt = 'n', yaxt = 'n', xlab = '# PCs', ylab = '# clusters')
   axis(1, at = seq(0, 1, length.out = nrow(s)), labels = rownames(s))
   axis(2, at = seq(0, 1, length.out = ncol(s)), labels = colnames(s))
 }
@@ -111,14 +111,14 @@ plot_scores <- function(optimal_params) {
 #' @param cores When `method` is `accurate`, the number of cores to use for parallel execution.
 #' @param max_pcs The maximum number of principal components to retain for the analysis.
 #' @param method Which version of the algorithm to use.
-#' @param n_samples When `method` is `fast`, the number of samples used to approximate the optimal solution.ç
-#' @param plot Logical. Whether to plot the scores for every tested `n_pcs`/`n_clusters` combination.
-#' @return `htad` object that specifies the clustering of genomic regions.
+#' @param n_samples When `method` is `fast`, the number of samples used to approximate the optimal solution.
+#' @param plot Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
+#' @return `htad` object that defines the clustering of genomic regions.
 #' @keywords per capita
 #' @import colorRamps
-#' @export
 #' @examples
 #' htads <- call_hTADs("file_name.abc")
+#' @export
 
 # TODO: either create one file per function (nice). Or one docstring just before each function.
 # I understand only exported functions in NAMESPACE are to have docs (maybe only call_hTADs).
@@ -128,7 +128,7 @@ call_hTADs <- function(file_name, cores = 1, max_pcs = 200, method = c('fast', '
   mat <- load_mat(file_name)
 
   # Sparse matrix and correlation.
-  sparse_matrix <- Matrix(mat, sparse = TRUE)
+  sparse_matrix <- Matrix::Matrix(mat, sparse = TRUE)
   correlation_matrix <- sparse_cor(sparse_matrix)$cor
   correlation_matrix[is.na(correlation_matrix)] <- 0 # Clean NA/NaN values.
 
