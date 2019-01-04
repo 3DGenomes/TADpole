@@ -31,7 +31,7 @@ End with an example of getting some data out of the system or using it for a lit
 
 We use a specific input to illustrate how the constrained hierarchical clustering works. The raw data is derived from a small locus (~ 150Mb) on the chromosome 18 from Hi-C experiment of RAO[ref] in GM12878 cell type using a specific 4bp-cutter restriction enzyme, MboI (SRA: SRR1658602).This chromosomal region can be represented as a symmetric contact matrixes (M), where each color point represents the average number of interactions between the bins (M[i,j]) on the chromosome.
 
-![alt text](https://github.com/paulasoler/HTADs/blob/master/zoom_pictures_test.pdf)
+![alt text](https://github.com/paulasoler/HTADs/blob/master/zoom_pictures_test-1.png)
 
 
 To obtain this 40kb-binned raw interaction matrix, we processed Hi-C data using a complete Python library, called TADbit, that deals with all the necessary steps to analyze, model and explore 3C-based data. https://github.com/3DGenomes/TADbit
