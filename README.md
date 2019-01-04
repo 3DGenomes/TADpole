@@ -6,6 +6,10 @@ A constrained hierarchical method to detect Topologically Associated Domains
 
 ### Installing
 
+You can install the package using the handy devtools::install_github.
+
+install.packages("devtools")
+
 A step by step series of examples that tell you how to get a development env running
 
 Say what the step will be
@@ -25,13 +29,19 @@ End with an example of getting some data out of the system or using it for a lit
 
 ## Running algorithm
 
-Explain how to run the automated tests for this system
+We use a specific input to illustrate how the constrained hierarchical clustering works. The raw data is derived from a small locus (~ 150Mb) on the chromosome 18 from Hi-C experiment of RAO[ref] in GM12878 cell type using a specific 4bp-cutter restriction enzyme, MboI (SRA: SRR1658602).This chromosomal region can be represented as a symmetric contact matrixes (M), where each color point represents the average number of interactions between the bins (M[i,j]) on the chromosome.
+
+![alt text](http:https://github.com/paulasoler/HTADs/zoom_pictures_test.pdf)
+
+
+To obtain this 40kb-binned raw interaction matrix, we processed Hi-C data using a complete Python library, called TADbit, that deals with all the necessary steps to analyze, model and explore 3C-based data. https://github.com/3DGenomes/TADbit
+
 
 ### Dependencies
 
 ```
+require(colorRamps)
 require(data.table)
-require(dryhic) --> NO HO TINC CLAR (soles es per a la symmetrix matrix)
 require(Matrix)
 require(doParallel)
 require(rioja)
