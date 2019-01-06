@@ -1,43 +1,40 @@
 # HTADs
 
-A constrained hierarchical method to detect Topologically Associated Domains
+The HTADs package applies a constrained hierarchical method to detect Topologically Associated Domains (TADs).
 
-## Getting Started
+## 1) Installing of the released version of HTADs.
 
-### Installing
+### 1.1) Using devtools package
 
-You can install the package using the handy devtools::install_github.
+- Step 1: Install the devtools package from CRAN
 
+```
 install.packages("devtools")
 
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
+```
+- Step 2: Install the HTADs package from GitHub
 
 ```
-# Load packages.
+library(devtools)
+install_github("paulasoler/HTADs")
+
+```
+- Step 3: Load the package
+```
+library(HTADs)
 
 ```
 
-And repeat
+### 1.2) Download, unzip and install manually the package.
 
 ```
-until finished
+wget https://github.com/paulasoler/HTADs/archive/master.zip (you have the alternative option using clone)
+unzip master.zip
+mv master HTADs
+sudo R CMD INSTALL HTADs
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running algorithm
-
-We use a specific input to illustrate how the constrained hierarchical clustering works. The raw data is derived from a small locus (~ 150Mb) on the chromosome 18 from Hi-C experiment of RAO[ref] in GM12878 cell type using a specific 4bp-cutter restriction enzyme, MboI (SRA: SRR1658602).This chromosomal region can be represented as a symmetric contact matrixes (M), where each color point represents the average number of interactions between the bins (M[i,j]) on the chromosome.
-
-![alt text](https://github.com/paulasoler/HTADs/blob/master/zoom_pictures_test-1.png)
-
-
-To obtain this 40kb-binned raw interaction matrix, we processed Hi-C data using a complete Python library, called TADbit, that deals with all the necessary steps to analyze, model and explore 3C-based data. https://github.com/3DGenomes/TADbit
-
-
-### Dependencies
+## 2) Dependencies
 
 ```
 require(colorRamps)
@@ -49,7 +46,26 @@ require(fpc)
 require(reshape2)
 ```
 
-### Format of input data:
+## 3) Getting started: Running algorithm
+
+We use a specific input to illustrate how the constrained hierarchical clustering works. The raw data is derived from Hi-C experiment of RAO [ref] in GM12878 cell type using a specific 4bp-cutter restriction enzyme, MboI (SRA: SRR1658602). We selected some loci which are spread over 74Mb, 10Mb and 6Mb from the chromosome 18 at 40kb of resolution.
+
+The data is stored inside the Master folder
+
+```
+- HTADs/Example_data/chromosome18_74Mb.tsv
+- HTADs/Example_data/chromosome18_10Mb.tsv
+- HTADs/Example_data/chromosome18_6Mb.tsv
+
+```
+These chromosomal regions can be represented as a symmetric contact matrixes (M), where each color point represents the average number of interactions between the bins (M[i,j]) on the chromosome. In these way, is easy to see how,as we zooming in diferents regions inside the chromosme, we can distiguish more multi-levels of TADs
+
+![alt text](https://github.com/paulasoler/HTADs/blob/master/zoom_pictures_test-1.png)
+
+To obtain this 40kb-binned raw interaction matrices, we processed Hi-C data using a complete Python library, called TADbit, that deals with all the necessary steps to analyze, model and explore 3C-based data. https://github.com/3DGenomes/TADbit
+
+
+### 3.1) Format of input data:
 We highly recommended normalize the data before to start the TAD caller. We give advice to use ONED normalization to correct the experimental bias that affects the signal profile defined by the contacts.
 https://github.com/qenvio/dryhic
 
@@ -61,17 +77,28 @@ https://github.com/qenvio/dryhic
 26	6	286.1442771
 17	13	1740.23475628
 ```
-### Visualization of the data and Pearson correlation matrix
+### 3.2) Pearson correlation matrix
 
-### PCA (200) + Why 200?
+Correlation coefficients were calculated between each bin of the matrices to construct a Pearson correlation matrix.
 
-### Fast version
+### 3.3) Iterative analysis
+The iteraitve analysis is composed by three main steps:
+- Principal component analysis
+- Applying probabilistic broken-stick model
+- Assesment using Calinski-Harabasz
+ 
+A parallel analysis of the first 200 principal components (PCs) was applied. In each case, the number of clusters was extracted as the maximum between the values that are above the one pre-estimated by the probabilistic broken-stick model. For each number of clusters, the Calinski-Harabasz index was calculated. The highest value was selected, as an optimal value for dividing the data by choosing the minimum number of components that increase the dispersion among the groups generated.
 
-### Optimazed version
+#### 3.3.1) Multiples iterative analysis version
 
-### Assesment of the method: Calinski
+-  Fast version
+NO multicore, random search para encontar la combinacion optima numero de clust i numero de PCA with arbitray precision.
 
-### Benchmarks
+- Optimazed version
+Todas las combinaciones n PCA y todos los posibles numero de cluster (the best) multicore
+Busqueda exhaustiva.
+
+### 3.4) Generation of RData output
 
 ## Built With
 
@@ -81,10 +108,6 @@ https://github.com/qenvio/dryhic
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
 ## Authors
 
 * **Paula Soler Vila** - *Initial work* - (https://github.com/paulasoler/)
@@ -92,13 +115,6 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
-## License
+## References
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
-
+* RAO
