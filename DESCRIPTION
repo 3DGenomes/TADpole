@@ -3,7 +3,7 @@ Type: Package
 Title: Call hierarchical TADs (hTADs)
 Version: 0.0.0.9000
 Authors@R: as.person(c(
-    'Paula Soler <paula.soler.vila@gmail.com> [aut, cre]',
+    'Paula Soler <paula.soler.vila@gmail.com> [aut]',
     'Pol Cuscó <polcusco@gmail.com> [aut, cre]'))
 Description: htads uses constrained hierarchical clustering to call
     hierarchical Topologically Associated Domains (hTADs) on HiC data.

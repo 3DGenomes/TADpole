@@ -1,15 +1,3 @@
-# TODO: refer to external functions as package::function(args)
-# The :: operator adds a small overhead.
-
-# Load packages.
-# library(colorRamps)
-# library(data.table)
-# library(doParallel)
-# library(fpc)
-# library(Matrix)
-# library(reshape2)
-# library(rioja)
-
 load_mat <- function(file_name){
     mat <- data.table::fread(file_name)
     colnames(mat) <- paste0('V', 1:3)
@@ -120,7 +108,7 @@ plot_scores <- function(optimal_params) {
 #' htads <- call_hTADs("file_name.abc")
 #' @export
 
-# TODO: either create one file per function (nice). Or one docstring just before each function.
+# TODO: either create one file per function (nice, or maybe too much), or one docstring just before each function.
 # I understand only exported functions in NAMESPACE are to have docs (maybe only call_hTADs).
 
 call_hTADs <- function(file_name, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, plot = FALSE) {
