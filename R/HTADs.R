@@ -1,13 +1,13 @@
 load_mat <- function(input_data){
     colnames(input_data) <- paste0('V', 1:3)
-    mat <- as.matrix(reshape2::acast(mat, V1 ~ V2, value.var = 'V3'))
+    mat <- reshape2::acast(input_data, V1 ~ V2, value.var = 'V3')
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
     Matrix::forceSymmetric(mat, uplo = 'L')
 }
 
 sparse_cor <- function(x) {
   # Create a sparse correlation matrix.
-  covmat <- (as.matrix(crossprod(x)) - nrow(x) * tcrossprod(colMeans(x))) / (nrow(x) - 1)
+  covmat <- (crossprod(as.matrix(x)) - nrow(x) * tcrossprod(colMeans(x))) / (nrow(x) - 1)
   sdvec <- sqrt(diag(covmat))
   cormat <- covmat / tcrossprod(sdvec)
   list(cov = covmat, cor = cormat)
@@ -82,9 +82,17 @@ find_params_fast <- function(pca, number_pca, n_samples) {
   list(n_PCs = optimal_PCs, n_clusters = optimal_n_clusters, scores = scores)
 }
 
-plot_scores <- function(optimal_params) {
+#' Plot the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters` combination
+#'
+#' @param htads `htad` object returned by `call_HTADs`.
+#' @examples
+#' plot_scores(htads)
+#' @export
+
+plot_scores <- function(htads) {
   # Plot nPCs vs nClusters CHi.
   s <- optimal_params$scores
+  htads$clusters[[]]
   layout(plotly::plot_ly(z = s, type = "heatmap"),
          title = 'Accurate method',
          scene = list(xaxis = list(title = 'Number of clusters'),
@@ -103,22 +111,23 @@ plot_scores <- function(optimal_params) {
 #' @param plot Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
 #' @return `htad` object that defines the clustering of genomic regions.
 #' @examples
-#' htads <- call_hTADs(input_data)
+#' htads <- call_HTADs(input_data)
 #' @export
 
 # TODO: either create one file per function (nice, or maybe too much), or one docstring just before each function.
-# I understand only exported functions in NAMESPACE are to have docs (maybe only call_hTADs).
+# I understand only exported functions in NAMESPACE are to have docs (maybe only call_HTADs).
 
-call_hTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, plot = FALSE) {
+call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, plot = FALSE) {
   # Load and clean data.
   mat <- load_mat(input_data)
 
   # Sparse matrix and correlation.
-  sparse_matrix <- Matrix::Matrix(mat, sparse = TRUE)
-  correlation_matrix <- sparse_cor(sparse_matrix)$cor
+  # sparse_matrix <- Matrix::Matrix(mat, sparse = TRUE)
+  # correlation_matrix <- sparse_cor(sparse_matrix)$cor
+  correlation_matrix <- sparse_cor(mat)$cor
   correlation_matrix[is.na(correlation_matrix)] <- 0 # Clean NA/NaN values.
 
-  # PCA (compute first `n.pcs` components).
+  # PCA (compute first `number_pca` components).
   number_pca <- min(max_pcs, nrow(mat))
   pca <- prcomp(correlation_matrix, rank. = number_pca)
 

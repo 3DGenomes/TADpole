@@ -5,3 +5,4 @@
 .Rproj.user
 .Rbuildignore
 HTADs.Rproj
+*.gz
