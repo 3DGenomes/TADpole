@@ -85,9 +85,10 @@ find_params_fast <- function(pca, number_pca, n_samples) {
 plot_scores <- function(optimal_params) {
   # Plot nPCs vs nClusters CHi.
   s <- optimal_params$scores
-  image(s, col = colorRamps::green2red(1024), xaxt = 'n', yaxt = 'n', xlab = '# PCs', ylab = '# clusters')
-  axis(1, at = seq(0, 1, length.out = nrow(s)), labels = rownames(s))
-  axis(2, at = seq(0, 1, length.out = ncol(s)), labels = colnames(s))
+  layout(plotly::plot_ly(z = s, type = "heatmap"),
+         title = 'Accurate method',
+         scene = list(xaxis = list(title = 'Number of clusters'),
+                      yaxis = list(title = 'Number of PCs')))
 }
 
 #' Call hierarchical TADs
