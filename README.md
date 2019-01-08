@@ -56,9 +56,9 @@ The data is stored inside the Master folder
 ```
 These chromosomal regions can be represented as a symmetric contact matrixes (M), where each color point represents the average number of interactions between the bins (M[i,j]) on the chromosome. In this way, it is easy to see (Figure 1) how, by zooming into different regions within the chromosome, we can distinguish multiple hierachical levels of TADs.
 
-![alt text](https://github.com/paulasoler/HTADs/blob/master/zoom_pictures_test-1.png)
+![Zoom](https://github.com/paulasoler/HTADs/blob/master/misc/zoom_pictures.png)
 
-To obtain this 40kb-binned raw interaction matrices, we processed Hi-C data using a complete Python library, called TADbit, that deals with all the necessary steps to analyze, model and explore 3C-based data. https://github.com/3DGenomes/TADbit. 
+To obtain this 40kb-binned raw interaction matrices, we processed Hi-C data using a complete Python library, called TADbit, that deals with all the necessary steps to analyze, model and explore 3C-based data. https://github.com/3DGenomes/TADbit.
 
 In this tutorial, we are going to use **chromosome18_10Mb.tsv** as a template but you have the possibility to run a complete chromosome (*chromosome18_74Mb.tsv*) or a smaler data set (*chromosome18_6Mb.tsv*).
 
@@ -67,7 +67,7 @@ In this tutorial, we are going to use **chromosome18_10Mb.tsv** as a template bu
 We highly recommended normalize the data before to start the TAD caller. We give advice to use ONED normalization to correct the experimental bias that affects the signal profile defined by the contacts.
 https://github.com/qenvio/dryhic
 
- - 3 columns-format stored in tab-separated value without header. The first and the second columns correspond to the pair of loci(i,j) which are stablish a average number of normalized interactions (the last column). 
+ - 3 columns-format stored in tab-separated value without header. The first and the second columns correspond to the pair of loci(i,j) which are stablish a average number of normalized interactions (the last column).
 
 ```
 28	27	1108.42577685
@@ -91,21 +91,21 @@ Correlation coefficients were calculated between each bin of the symmetric norma
   # PCA (compute first `n.pcs` components).
   number_pca <- min(max_pcs, nrow(mat))
   pca <- prcomp(correlation_matrix, rank. = number_pca)
-```  
+```
 
 ### 3.3) Find optimal clustering parameters based on Calinhara score.
 
 #### 3.3.1) Multiples iterative analysis version
 
-> ***Fast version***
+> ***Fast method***
 - Based on a random permutation search that allows to find the optimal combination between the number of cluster and the number of PCs with arbitrary precision.
 - Not multicore implemented.
 
-> ***Optimazed version***
+> ***Accurate method***
 - Based of the exhaustive search method to get the best combination between all the possible PCs and number of clusters combinations.
 - Multicore implemented.
 
-![alt text](https://github.com/paulasoler/HTADs/blob/master/Optimazed_version.png)
+![CHindex](https://github.com/paulasoler/HTADs/blob/master/misc/CHindex_accurate_method.png)
 
 ### 3.4) Generation of RData output
 
@@ -121,7 +121,7 @@ The Rdata created is a R object with contains the following information:
 load("chromosome18_10Mb.Rdata")
 head(htads)
 
-$n_pcs 
+$n_pcs
 [1] 41
 
 $optimal_n_clusters
@@ -132,9 +132,9 @@ $dendro
 Call:
 rioja::chclust(d = dist(pcs))
 
-Cluster method   : coniss 
-Distance         : euclidean 
-Number of objects: 251 
+Cluster method   : coniss
+Distance         : euclidean
+Number of objects: 251
 
 
 $clusters
