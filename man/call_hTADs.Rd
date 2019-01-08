@@ -4,11 +4,11 @@
 \alias{call_hTADs}
 \title{Call hierarchical TADs}
 \usage{
-call_hTADs(file_name, cores = 1, max_pcs = 200, method = c("fast",
+call_hTADs(input_data, cores = 1, max_pcs = 200, method = c("fast",
   "accurate"), n_samples = 60, plot = FALSE)
 }
 \arguments{
-\item{file_name}{The path to the file to read.}
+\item{input_data}{`data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.}
 
 \item{cores}{When `method` is `"accurate"`, the number of cores to use for parallel execution.}
 
@@ -28,5 +28,5 @@ Computes a constrained hierarchical clustering of genomic regions in a HiC exper
 choosing the optimal amount of information from the HiC matrix and selecting the most informative number of TADs.
 }
 \examples{
-htads <- call_hTADs("file_name.abc")
+htads <- call_hTADs(input_data)
 }

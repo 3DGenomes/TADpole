@@ -1,6 +1,5 @@
-load_mat <- function(file_name){
-    mat <- data.table::fread(file_name)
-    colnames(mat) <- paste0('V', 1:3)
+load_mat <- function(input_data){
+    colnames(input_data) <- paste0('V', 1:3)
     mat <- as.matrix(reshape2::acast(mat, V1 ~ V2, value.var = 'V3'))
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
     Matrix::forceSymmetric(mat, uplo = 'L')
@@ -95,7 +94,7 @@ plot_scores <- function(optimal_params) {
 #'
 #' Computes a constrained hierarchical clustering of genomic regions in a HiC experiment,
 #' choosing the optimal amount of information from the HiC matrix and selecting the most informative number of TADs.
-#' @param file_name The path to the file to read.
+#' @param input_data `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.
 #' @param cores When `method` is `"accurate"`, the number of cores to use for parallel execution.
 #' @param max_pcs The maximum number of principal components to retain for the analysis.
 #' @param method Which version of the algorithm to use.
@@ -103,15 +102,15 @@ plot_scores <- function(optimal_params) {
 #' @param plot Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
 #' @return `htad` object that defines the clustering of genomic regions.
 #' @examples
-#' htads <- call_hTADs("file_name.abc")
+#' htads <- call_hTADs(input_data)
 #' @export
 
 # TODO: either create one file per function (nice, or maybe too much), or one docstring just before each function.
 # I understand only exported functions in NAMESPACE are to have docs (maybe only call_hTADs).
 
-call_hTADs <- function(file_name, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, plot = FALSE) {
+call_hTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, plot = FALSE) {
   # Load and clean data.
-  mat <- load_mat(file_name)
+  mat <- load_mat(input_data)
 
   # Sparse matrix and correlation.
   sparse_matrix <- Matrix::Matrix(mat, sparse = TRUE)

@@ -12,7 +12,6 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     colorRamps (>= 2.3),
-    data.table (>= 1.11.8),
     doParallel (>= 1.0.14),
     fpc (>= 2.1-11.1),
     Matrix (>= 1.2-15),
