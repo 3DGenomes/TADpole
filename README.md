@@ -2,48 +2,49 @@
 
 The HTADs package applies a constrained hierarchical method to detect Topologically Associated Domains (TADs).
 
-## 1) Installing of the released version of HTADs.
+## 1) Installation
 
-### 1.1) Using devtools package
+### 1.1) Using the _devtools_ package
 
-- Step 1: Install the devtools package from CRAN
+This is the recommended way of installing HTADs.
+
+- First, install the devtools package from CRAN, if it is not already installed.
 
 ```
 install.packages("devtools")
 ```
-- Step 2: Install the HTADs package from GitHub
+
+- Then, Install the HTADs package from GitHub
 
 ```
-library(devtools)
-install_github("paulasoler/HTADs")
-```
-- Step 3: Load the package
-```
-library(HTADs)
+devtools::install_github("paulasoler/HTADs")
 ```
 
-### 1.2) Download, unzip and install manually the package.
+### 1.2) Manual installation from source
+
+- First, get the latest version of the source code
+
+You can do this with _wget_:
 
 ```
-wget https://github.com/paulasoler/HTADs/archive/master.zip (you have the alternative option using clone)
+wget https://github.com/paulasoler/HTADs/archive/master.zip
 unzip master.zip
 mv master HTADs
-sudo R CMD INSTALL HTADs
 ```
 
-## 2) Dependencies
+Or simply clone the repository:
 
 ```
-require(colorRamps)
-require(data.table)
-require(Matrix)
-require(doParallel)
-require(rioja)
-require(fpc)
-require(reshape2)
+git clone https://github.com/paulasoler/HTADs.git
 ```
 
-## 3) Getting started: Running algorithm
+- Then, install the package
+
+```
+R CMD INSTALL HTADs
+```
+
+## 2) Getting started: Running algorithm
 
 We use a specific input to illustrate how the constrained hierarchical clustering works. The raw data is derived from Hi-C experiment of RAO[1] in GM12878 cell type using a specific 4bp-cutter restriction enzyme, MboI (SRA: SRR1658602). We selected some loci which are spread over 74Mb, 10Mb and 6Mb from the chromosome 18 at 40kb of resolution.
 
@@ -75,24 +76,6 @@ https://github.com/qenvio/dryhic
 26	6	286.1442771
 17	13	1740.23475628
 ```
-### 3.2) Pearson correlation matrix and Principal Component Analysis
-
-Correlation coefficients were calculated between each bin of the symmetric normalize matrix to construct a Pearson correlation matrix.This matrix is the input to compute the first 200 principal components*(PCs)*.
-
-```
-  # Load and clean data.
-  mat <- load_mat(file_name)
-
-  # Sparse matrix and correlation.
-  sparse_matrix <- Matrix::Matrix(mat, sparse = TRUE)
-  correlation_matrix <- sparse_cor(sparse_matrix)$cor
-  correlation_matrix[is.na(correlation_matrix)] <- 0
-
-  # PCA (compute first `n.pcs` components).
-  number_pca <- min(max_pcs, nrow(mat))
-  pca <- prcomp(correlation_matrix, rank. = number_pca)
-```
-
 ### 3.3) Find optimal clustering parameters based on Calinhara score.
 
 #### 3.3.1) Multiples iterative analysis version
