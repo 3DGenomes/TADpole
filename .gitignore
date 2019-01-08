@@ -3,4 +3,5 @@
 .RData
 .Ruserdata
 .Rproj.user
+.Rbuildignore
 HTADs.Rproj
