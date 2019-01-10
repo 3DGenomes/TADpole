@@ -13,6 +13,7 @@ LazyData: true
 Imports:
     doParallel (>= 1.0.14),
     fpc (>= 2.1-11.1),
+    lattice (>= 0.20-35),
     Matrix (>= 1.2-15),
     reshape2 (>= 1.4.3),
     rioja (>= 0.9-15.1)
