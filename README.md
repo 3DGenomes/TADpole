@@ -67,9 +67,9 @@ To run the main funcion `call_HTADs`, you need to supply a `data.frame` with 3 c
 
 ```
 28 27 1108.4257768
-22	12 423.8081569
-26	 6 286.1442771
-17	13 1740.2347562
+22 12 423.8081569
+26 6  286.1442771
+17 13 1740.2347562
 ```
 
 ### 2.2) Running the algorithm
