@@ -144,7 +144,7 @@ matrix_chr18_10Mb <- load_mat(chromosome18_10Mb)
 plot_borders(matrix_chr18_10Mb, htads)
 ```
 
-![Zoom](https://github.com/paulasoler/HTADs/blob/master/misc/dendogram-1.png)
+![Zoom](https://github.com/paulasoler/HTADs/blob/master/misc/dendogram-1_2.png)
 
 ## Authors
 
