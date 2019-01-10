@@ -99,6 +99,25 @@ plot_scores <- function(htads) {
                       yaxis = list(title = 'Number of PCs')))
 }
 
+#' TAD border detection plot
+#'
+#' @param mat `mat` object returned by `load_mat`.
+#' @param htads `htad` object returned by `call_HTADs`.
+#' @examples
+#' plot_borders(mat,htads)
+#' @export
+
+plot_borders <- function(matrix,htads_output){
+    norm_coord = htads_output$clusters[[htads_output$optimal_n_clusters-1]]$coord$start
+    bwr.colors <- colorRampPalette(c("white", "firebrick3"))
+    levelplot(as.matrix(log(matrix)),col.regions = bwr.colors, scales = list(draw = FALSE),colorkey = FALSE, xlab =
+            NULL, ylab = NULL, par.settings = list(axis.line = list(col = "black")),
+          panel = function(...){
+            panel.levelplot(...)
+            panel.abline(h = norm_coord,lty = "dotted", col = "black")
+            panel.abline(v = norm_coord,lty = "dotted", col = "black")
+        })}
+
 #' Call hierarchical TADs
 #'
 #' Computes a constrained hierarchical clustering of genomic regions in a HiC experiment,
