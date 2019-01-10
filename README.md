@@ -84,12 +84,15 @@ htads <- call_hTADs(chromosome18_10Mb)
 - **cores**: Numeric. When `method` is `"accurate"`, the number of cores to use for parallel execution.
 - **max_pcs**: Numeric. The maximum number of principal components to retain for the analysis. Default value is recommended.
 - **method**: Character. Which version of the algorithm to use. `"fast"` or `"accurate"`.
-  > ***Fast***
-  + Performs a random search over all possible solutions.
-  + Its precision can be increased at the expense of computation time by increasing the `n_samples` parameter.
-  > ***Accurate***
-  + Performs an _exhaustive_ search of all possible solutions.
-  + Has support for multicore parallelization.
+  
+  -- ***Fast***
+    - Performs a random search over all possible solutions.
+    - Its precision can be increased at the expense of computation time by increasing the `n_samples` parameter.
+  
+  -- ***Accurate***
+    - Performs an _exhaustive_ search of all possible solutions.
+    - Has support for multicore parallelization.
+  
 - **n_samples**: Numeric. When `method` is `"fast"`, the number of samples used to approximate the optimal solution.
 - **plot**: Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
 
