@@ -130,7 +130,8 @@ plot_borders <- function(matrix,htads_output){
 #' @param plot Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
 #' @return `htad` object that defines the clustering of genomic regions.
 #' @examples
-#' htads <- call_HTADs(input_data)
+#' load('data/chromosome18_10Mb.Rdata')
+#' htads <- call_hTADs(chromosome18_10Mb)
 #' @export
 
 # TODO: either create one file per function (nice, or maybe too much), or one docstring just before each function.
