@@ -64,7 +64,7 @@ To obtain this 40kb-binned raw interaction matrices, we processed Hi-C data usin
 In this tutorial, we are going to use **chromosome18_10Mb.tsv** as a template but you have the possibility to run a complete chromosome (*chromosome18_74Mb.tsv*) or a smaler data set (*chromosome18_6Mb.tsv*).
 
 
-### 3.1) Format of input data:
+### 2.1) Format of input data:
 We highly recommended normalize the data before to start the TAD caller. We give advice to use ONED normalization to correct the experimental bias that affects the signal profile defined by the contacts.
 https://github.com/qenvio/dryhic
 
@@ -76,9 +76,9 @@ https://github.com/qenvio/dryhic
 26	6	286.1442771
 17	13	1740.23475628
 ```
-### 3.3) Find optimal clustering parameters based on Calinhara score.
+### 3.2) Find optimal clustering parameters based on Calinhara score.
 
-#### 3.3.1) Multiples iterative analysis version
+#### 3.2.1) Multiples iterative analysis version
 
 > ***Fast method***
 - Based on a random permutation search that allows to find the optimal combination between the number of cluster and the number of PCs with arbitrary precision.
@@ -88,9 +88,22 @@ https://github.com/qenvio/dryhic
 - Based of the exhaustive search method to get the best combination between all the possible PCs and number of clusters combinations.
 - Multicore implemented.
 
+ #### Parameters to run the ***call_hTADs*** function
+   1) ***$filename*** = Path of the normalized 3 columns-format matrix. 
+   2) ***$cores*** = Number of cores to paralelize the accurate method.
+   3) ***$max_pcs*** = Total number of analysed principal components.
+   4) ***$method$*** = Type of seach method: fast or accurate.
+   5) ***$n_samples*** = Number of random permutations to apply for the fast method.
+   6) ***plot*** = Plot the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters` combination
+
+```
+htads_output_chr18_10Mb = call_hTADs("/scratch/pauli/TAD_caller/Sample_exemple/chromosome18_10Mb.tsv",method = "accurate", plot = TRUE)
+```
+Parameters of the 
+
 ![CHindex](https://github.com/paulasoler/HTADs/blob/master/misc/CHindex_accurate_method.png)
 
-### 3.4) Generation of RData output
+### 3.3) Generation of RData output
 
 The Rdata created is a R object with contains the following information:
    1) ***$n_pcs*** = Optimal number of principal components
@@ -131,6 +144,15 @@ start end
 2     27  45
 3     46  72
 ```
+
+### 3.4) Generation of plot with optimal number of cluster.
+
+```
+matrix_chr18_10Mb = load_mat("/scratch/pauli/TAD_caller/Sample_exemple/chromosome18_10Mb.tsv")
+plot_borders(matrix_chr18_10Mb,htads_output_chr18_10Mb)
+```
+![Zoom](https://github.com/paulasoler/HTADs/blob/master/misc/dendogram-1.png)
+
 
 ## Built With
 
