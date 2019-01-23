@@ -82,21 +82,25 @@ find_params_fast <- function(pca, number_pca, n_samples) {
   list(n_PCs = optimal_PCs, n_clusters = optimal_n_clusters, scores = scores)
 }
 
-#' Plot the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters` combination
+#' Plot a heatmap of the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters` combination
 #'
 #' @param htads `htad` object returned by `call_HTADs`.
+#' @param file path to save the plot in html format. If `NULL` (default), the plot will not be saved on disk.
 #' @examples
-#' plot_scores(htads)
+#' load('data/chromosome18_10Mb.Rdata')
+#' htads <- call_hTADs(chromosome18_10Mb)
+#' plot_scores(htads, file = 'scores_chromosome18_10Mb.html')
 #' @export
 
-plot_scores <- function(htads) {
+plot_scores <- function(htads, file = NULL) {
   # Plot nPCs vs nClusters CHi.
-  s <- optimal_params$scores
-  htads$clusters[[]]
-  layout(plotly::plot_ly(z = s, type = "heatmap"),
-         title = 'Accurate method',
-         scene = list(xaxis = list(title = 'Number of clusters'),
-                      yaxis = list(title = 'Number of PCs')))
+  s <- htads$optimal_params$scores
+  p <- layout(plotly::plot_ly(z = s, type = "heatmap"),
+              title = 'Accurate method',
+              scene = list(xaxis = list(title = 'Number of clusters'),
+                           yaxis = list(title = 'Number of PCs')))
+  if (!is.null(file)) htmlwidgets::saveWidget(p, file)
+  p
 }
 
 #' TAD border detection plot
@@ -104,6 +108,8 @@ plot_scores <- function(htads) {
 #' @param mat `mat` object returned by `load_mat`.
 #' @param htads `htad` object returned by `call_HTADs`.
 #' @examples
+#' load('data/chromosome18_10Mb.Rdata')
+#' htads <- call_hTADs(chromosome18_10Mb)
 #' plot_borders(mat,htads)
 #' @export
 
@@ -137,12 +143,12 @@ plot_borders <- function(matrix,htads_output){
 # TODO: either create one file per function (nice, or maybe too much), or one docstring just before each function.
 # I understand only exported functions in NAMESPACE are to have docs (maybe only call_HTADs).
 
-call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, plot = FALSE) {
+call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60) {
   # Load and clean data.
   mat <- load_mat(input_data)
 
   # Sparse matrix and correlation.
-  # sparse_matrix <- Matrix::Matrix(mat, sparse = TRUE)
+  # sparse_matrix <- Matrix::Matrix(mat , sparse = TRUE)
   # correlation_matrix <- sparse_cor(sparse_matrix)$cor
   correlation_matrix <- sparse_cor(mat)$cor
   correlation_matrix[is.na(correlation_matrix)] <- 0 # Clean NA/NaN values.
@@ -157,9 +163,6 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 
                            fast = find_params_fast(pca, number_pca, n_samples),
                            accurate = find_params_accurate(pca, number_pca, cores))
 
-  # Plot nPCs vs nClusters Calinhara score.
-  if (plot) plot_scores(optimal_params)
-
   # Cluster the PCs subset with the best mean-CHI criterion.
   pcs <- as.matrix(pca$x[, 1:optimal_params$n_PCs])
   row.names(pcs) <- 1:nrow(pcs)
@@ -169,7 +172,8 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 
   htads <- list('n_pcs' = optimal_params$n_PCs[[1]],
                 'optimal_n_clusters' = optimal_params$n_clusters[[1]],
                 'dendro' = clust,
-                'clusters' = list())
+                'clusters' = list(),
+                'scores' = optimal_params$scores)
   for (n in which(!is.na(optimal_params$scores[optimal_params$n_PCs, ]))) {
     eb <- cumsum(table(cutree(clust, k = n)))
     htads$clusters[[as.character(n)]] <- list('CH-index' = optimal_params$scores[optimal_params$n_PCs, n],

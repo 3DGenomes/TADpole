@@ -2,16 +2,20 @@
 % Please edit documentation in R/HTADs.R
 \name{plot_scores}
 \alias{plot_scores}
-\title{Plot the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters` combination}
+\title{Plot a heatmap of the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters` combination}
 \usage{
-plot_scores(htads)
+plot_scores(htads, file = NULL)
 }
 \arguments{
 \item{htads}{`htad` object returned by `call_HTADs`.}
+
+\item{file}{path to save the plot in html format. If `NULL` (default), the plot will not be saved on disk.}
 }
 \description{
-Plot the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters` combination
+Plot a heatmap of the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters` combination
 }
 \examples{
-plot_scores(htads)
+load('data/chromosome18_10Mb.Rdata')
+htads <- call_hTADs(chromosome18_10Mb)
+plot_scores(htads, file = 'scores_chromosome18_10Mb.html')
 }

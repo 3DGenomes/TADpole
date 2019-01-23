@@ -5,7 +5,7 @@
 \title{Call hierarchical TADs}
 \usage{
 call_HTADs(input_data, cores = 1, max_pcs = 200, method = c("fast",
-  "accurate"), n_samples = 60, plot = FALSE)
+  "accurate"), n_samples = 60)
 }
 \arguments{
 \item{input_data}{`data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.}
@@ -28,5 +28,6 @@ Computes a constrained hierarchical clustering of genomic regions in a HiC exper
 choosing the optimal amount of information from the HiC matrix and selecting the most informative number of TADs.
 }
 \examples{
-htads <- call_HTADs(input_data)
+load('data/chromosome18_10Mb.Rdata')
+htads <- call_hTADs(chromosome18_10Mb)
 }
