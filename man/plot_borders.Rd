@@ -2,20 +2,20 @@
 % Please edit documentation in R/HTADs.R
 \name{plot_borders}
 \alias{plot_borders}
-\title{TAD border detection plot}
+\title{Plot TAD borders on a HiC matrix}
 \usage{
-plot_borders(matrix, htads_output)
+plot_borders(htads, input_data)
 }
 \arguments{
-\item{mat}{`mat` object returned by `load_mat`.}
-
 \item{htads}{`htad` object returned by `call_HTADs`.}
+
+\item{input_data}{`data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`..}
 }
 \description{
-TAD border detection plot
+Plot TAD borders on a HiC matrix
 }
 \examples{
 load('data/chromosome18_10Mb.Rdata')
-htads <- call_hTADs(chromosome18_10Mb)
-plot_borders(mat,htads)
+htads <- call_HTADs(chromosome18_10Mb)
+plot_borders(htads, input_data)
 }

@@ -16,6 +16,6 @@ Plot a heatmap of the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters
 }
 \examples{
 load('data/chromosome18_10Mb.Rdata')
-htads <- call_hTADs(chromosome18_10Mb)
+htads <- call_HTADs(chromosome18_10Mb)
 plot_scores(htads, file = 'scores_chromosome18_10Mb.html')
 }

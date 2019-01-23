@@ -29,5 +29,5 @@ choosing the optimal amount of information from the HiC matrix and selecting the
 }
 \examples{
 load('data/chromosome18_10Mb.Rdata')
-htads <- call_hTADs(chromosome18_10Mb)
+htads <- call_HTADs(chromosome18_10Mb)
 }

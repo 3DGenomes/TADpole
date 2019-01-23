@@ -2,7 +2,7 @@ load_mat <- function(input_data){
     colnames(input_data) <- paste0('V', 1:3)
     mat <- reshape2::acast(input_data, V1 ~ V2, value.var = 'V3')
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
-    Matrix::forceSymmetric(mat, uplo = 'L')
+    as.matrix(Matrix::forceSymmetric(mat, uplo = 'L'))
 }
 
 sparse_cor <- function(x) {
@@ -88,41 +88,43 @@ find_params_fast <- function(pca, number_pca, n_samples) {
 #' @param file path to save the plot in html format. If `NULL` (default), the plot will not be saved on disk.
 #' @examples
 #' load('data/chromosome18_10Mb.Rdata')
-#' htads <- call_hTADs(chromosome18_10Mb)
+#' htads <- call_HTADs(chromosome18_10Mb)
 #' plot_scores(htads, file = 'scores_chromosome18_10Mb.html')
 #' @export
 
 plot_scores <- function(htads, file = NULL) {
   # Plot nPCs vs nClusters CHi.
-  s <- htads$optimal_params$scores
-  p <- layout(plotly::plot_ly(z = s, type = "heatmap"),
-              title = 'Accurate method',
-              scene = list(xaxis = list(title = 'Number of clusters'),
-                           yaxis = list(title = 'Number of PCs')))
+  s <- htads$scores
+  p <- plotly::layout(plotly::plot_ly(z = s, type = "heatmap"),
+                      title = 'Caliski-Harabasz index',
+                      xaxis = list(title = 'Number of clusters'),
+                      yaxis = list(title = 'Number of PCs'))
   if (!is.null(file)) htmlwidgets::saveWidget(p, file)
   p
 }
 
-#' TAD border detection plot
+#' Plot TAD borders on a HiC matrix
 #'
-#' @param mat `mat` object returned by `load_mat`.
 #' @param htads `htad` object returned by `call_HTADs`.
+#' @param input_data `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`..
 #' @examples
 #' load('data/chromosome18_10Mb.Rdata')
-#' htads <- call_hTADs(chromosome18_10Mb)
-#' plot_borders(mat,htads)
+#' htads <- call_HTADs(chromosome18_10Mb)
+#' plot_borders(htads, input_data)
 #' @export
 
-plot_borders <- function(matrix,htads_output){
-    norm_coord = htads_output$clusters[[htads_output$optimal_n_clusters-1]]$coord$start
-    bwr.colors <- colorRampPalette(c("white", "firebrick3"))
-    levelplot(as.matrix(log(matrix)),col.regions = bwr.colors, scales = list(draw = FALSE),colorkey = FALSE, xlab =
-            NULL, ylab = NULL, par.settings = list(axis.line = list(col = "black")),
-          panel = function(...){
-            panel.levelplot(...)
-            panel.abline(h = norm_coord,lty = "dotted", col = "black")
-            panel.abline(v = norm_coord,lty = "dotted", col = "black")
-        })}
+plot_borders <- function(htads, input_data) {
+    mat <- load_mat(input_data)
+    start.coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$start
+    colors <- colorRampPalette(c('white', 'firebrick3'))
+    lattice::levelplot(as.matrix(log(mat)),col.regions = colors, scales = list(draw = FALSE), colorkey = FALSE,
+                       xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
+                       panel = function(...) {
+                           lattice::panel.levelplot(...)
+                           lattice::panel.abline(h = start.coord,lty = 'dotted', col = 'black')
+                           lattice::panel.abline(v = start.coord,lty = 'dotted', col = 'black')
+                       })
+}
 
 #' Call hierarchical TADs
 #'
@@ -137,11 +139,11 @@ plot_borders <- function(matrix,htads_output){
 #' @return `htad` object that defines the clustering of genomic regions.
 #' @examples
 #' load('data/chromosome18_10Mb.Rdata')
-#' htads <- call_hTADs(chromosome18_10Mb)
+#' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
 
 # TODO: either create one file per function (nice, or maybe too much), or one docstring just before each function.
-# I understand only exported functions in NAMESPACE are to have docs (maybe only call_HTADs).
+# I understand only exported functions in NAMESPACE are to have docs.
 
 call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60) {
   # Load and clean data.
