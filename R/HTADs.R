@@ -106,24 +106,39 @@ plot_scores <- function(htads, file = NULL) {
 #' Plot TAD borders on a HiC matrix
 #'
 #' @param htads `htad` object returned by `call_HTADs`.
-#' @param input_data `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`..
+#' @param input_data `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.
+#' @param add.dendro Logical. If `TRUE`, plot the clustering dendrogram beside the HiC matrix.
 #' @examples
 #' load('data/chromosome18_10Mb.Rdata')
 #' htads <- call_HTADs(chromosome18_10Mb)
-#' plot_borders(htads, input_data)
+#' plot_borders(htads, chromosome18_10Mb)
 #' @export
 
 plot_borders <- function(htads, input_data) {
     mat <- load_mat(input_data)
-    start.coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$start
+    start_coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$start
     colors <- colorRampPalette(c('white', 'firebrick3'))
-    lattice::levelplot(as.matrix(log(mat)),col.regions = colors, scales = list(draw = FALSE), colorkey = FALSE,
+
+    lattice::levelplot(as.matrix(log(mat)), col.regions = colors, scales = list(draw = FALSE), colorkey = FALSE,
                        xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
                        panel = function(...) {
                            lattice::panel.levelplot(...)
-                           lattice::panel.abline(h = start.coord,lty = 'dotted', col = 'black')
-                           lattice::panel.abline(v = start.coord,lty = 'dotted', col = 'black')
+                           lattice::panel.abline(h = start_coord, lty = 'dotted', col = 'black')
+                           lattice::panel.abline(v = start_coord, lty = 'dotted', col = 'black')
                        })
+}
+
+#' Plot dendrogram
+#'
+#' @param htads `htad` object returned by `call_HTADs`.
+#' @examples
+#' load('data/chromosome18_10Mb.Rdata')
+#' htads <- call_HTADs(chromosome18_10Mb)
+#' plot_dendro(htads)
+#' @export
+
+plot_dendro <- function(htads) {
+    plot(htads$dendro, labels = FALSE, hang = -1)
 }
 
 #' Call hierarchical TADs
@@ -141,9 +156,6 @@ plot_borders <- function(htads, input_data) {
 #' load('data/chromosome18_10Mb.Rdata')
 #' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
-
-# TODO: either create one file per function (nice, or maybe too much), or one docstring just before each function.
-# I understand only exported functions in NAMESPACE are to have docs.
 
 call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60) {
   # Load and clean data.
@@ -171,11 +183,12 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 
   clust <- rioja::chclust(dist(pcs))
 
   # Create hierarchical cluster object.
-  htads <- list('n_pcs' = optimal_params$n_PCs[[1]],
-                'optimal_n_clusters' = optimal_params$n_clusters[[1]],
-                'dendro' = clust,
-                'clusters' = list(),
-                'scores' = optimal_params$scores)
+  htads <- structure(list('n_pcs' = optimal_params$n_PCs[[1]],
+                          'optimal_n_clusters' = optimal_params$n_clusters[[1]],
+                          'dendro' = clust,
+                          'clusters' = list(),
+                          'scores' = optimal_params$scores),
+                     class = 'htads')
   for (n in which(!is.na(optimal_params$scores[optimal_params$n_PCs, ]))) {
     eb <- cumsum(table(cutree(clust, k = n)))
     htads$clusters[[as.character(n)]] <- list('CH-index' = optimal_params$scores[optimal_params$n_PCs, n],

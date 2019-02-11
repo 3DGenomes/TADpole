@@ -2,4 +2,5 @@
 
 export(call_HTADs)
 export(plot_borders)
+export(plot_dendro)
 export(plot_scores)

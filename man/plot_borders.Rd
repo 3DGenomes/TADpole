@@ -9,7 +9,9 @@ plot_borders(htads, input_data)
 \arguments{
 \item{htads}{`htad` object returned by `call_HTADs`.}
 
-\item{input_data}{`data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`..}
+\item{input_data}{`data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.}
+
+\item{add.dendro}{Logical. If `TRUE`, plot the clustering dendrogram beside the HiC matrix.}
 }
 \description{
 Plot TAD borders on a HiC matrix
@@ -17,5 +19,5 @@ Plot TAD borders on a HiC matrix
 \examples{
 load('data/chromosome18_10Mb.Rdata')
 htads <- call_HTADs(chromosome18_10Mb)
-plot_borders(htads, input_data)
+plot_borders(htads, chromosome18_10Mb)
 }
