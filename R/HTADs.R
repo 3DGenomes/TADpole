@@ -17,7 +17,7 @@ sparse_cor <- function(x) {
   list(cov = covmat, cor = cormat)
 }
 
-find_params_accurate <- function(pca, number_pca, cores) {
+find_params_accurate <- function(pca, number_pca, cores, min_clusters) {
   doParallel::registerDoParallel(cores = cores)
   calinhara_score <- foreach::foreach(i = 1:number_pca) %dopar% {
     pcs <- as.matrix(pca$x[, 1:i])
@@ -31,7 +31,7 @@ find_params_accurate <- function(pca, number_pca, cores) {
     n_cluster <- r$lengths[r$values][1]
 
     score <- rep(NA, n_cluster)
-    for (n in 1:n_cluster) {
+    for (n in min_clusters:n_cluster) {
       chc <- cutree(clust, k = n)
       score[n] <- fpc::calinhara(pca$x, chc, cn = n)
     }
@@ -52,7 +52,7 @@ find_params_accurate <- function(pca, number_pca, cores) {
   list(n_PCs = optimal_PCs, n_clusters = optimal_n_clusters, scores = scores)
 }
 
-find_params_fast <- function(pca, number_pca, n_samples) {
+find_params_fast <- function(pca, number_pca, n_samples, min_clusters) {
   n_pca <- sample(number_pca, n_samples, replace = TRUE)
   n_clu <- rep(NA, n_samples)
   calinhara_score <- list()
@@ -68,7 +68,7 @@ find_params_fast <- function(pca, number_pca, n_samples) {
     r <- rle(bs$dispersion > bs$bstick)
     n_cluster <- r$lengths[r$values][1]
 
-    n_clu[i] <- sample(1:n_cluster, 1)
+    n_clu[i] <- sample(min_clusters:n_cluster, 1)
     chc <- cutree(clust, k = n_clu[i])
     calinhara_score[[i]] <- fpc::calinhara(pca$x, chc, cn = n_clu[i])
   }
@@ -154,6 +154,7 @@ plot_dendro <- function(htads) {
 #' @param max_pcs The maximum number of principal components to retain for the analysis.
 #' @param method Which version of the algorithm to use.
 #' @param n_samples When `method` is `"fast"`, the number of samples used to approximate the optimal solution.
+#' @param min_clusters ###### WRITE THIS UP ######.
 #' @param plot Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
 #' @return `htad` object that defines the clustering of genomic regions.
 #' @examples
@@ -161,7 +162,7 @@ plot_dendro <- function(htads) {
 #' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
 
-call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60) {
+call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, min_clusters = 2) {
   # Load and clean data.
   mat <- load_mat(input_data)
 
@@ -178,8 +179,8 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 
   # Find optimal clustering parameters based on Calinhara score.
   method <- match.arg(method)
   optimal_params <- switch(method,
-                           fast = find_params_fast(pca, number_pca, n_samples),
-                           accurate = find_params_accurate(pca, number_pca, cores))
+                           fast = find_params_fast(pca, number_pca, n_samples, min_clusters),
+                           accurate = find_params_accurate(pca, number_pca, cores, min_clusters))
 
   # Cluster the PCs subset with the best mean-CHI criterion.
   pcs <- as.matrix(pca$x[, 1:optimal_params$n_PCs])
