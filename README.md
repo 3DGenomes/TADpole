@@ -4,6 +4,7 @@ The HTADs package applies a constrained hierarchical method to detect Topologica
 
 ## 1) Installation
 
+<!--
 ### 1.1) Using the _devtools_ package
 
 This is the recommended way of installing HTADs.
@@ -21,6 +22,7 @@ devtools::install_github("paulasoler/HTADs")
 ```
 
 ### 1.2) Manual installation from source
+-->
 
 - First, get the latest version of the source code
 
