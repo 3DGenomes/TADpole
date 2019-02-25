@@ -96,6 +96,7 @@ htads <- call_HTADs(chromosome18_10Mb, method = 'accurate')
     - Has support for multicore parallelization.
   
 - **n_samples**: Numeric. When `method` is `"fast"`, the number of samples used to approximate the optimal solution.
+- **min_clusters**: Numeric. ###### WRITE THIS UP ######
 - **plot**: Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
 
 ## 3) Output
