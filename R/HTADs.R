@@ -145,6 +145,40 @@ plot_dendro <- function(htads) {
     plot(htads$dendro, labels = FALSE, hang = -1)
 }
 
+#' Plot retained variance
+#'
+#' @param input_data `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.
+#' @param max_pcs The maximum number of principal components whose cumulative variance is to be plotted.
+#' @param mark A place on the abcissa where to put a visual mark.
+#' @examples
+#' load('data/chromosome18_10Mb.Rdata')
+#' plot_var(chromosome18_10Mb)
+#' @export
+
+plot_var <- function(input_data, max_pcs = NULL, mark = 200) {
+  mat <- load_mat(input_data)
+  
+  # Sparse matrix and correlation.
+  correlation_matrix <- sparse_cor(mat)$cor
+  correlation_matrix[is.na(correlation_matrix)] <- 0 # Clean NA/NaN values.
+  
+  # PCA (compute first `number_pca` components).
+  if (is.null(max_pcs)) max_pcs <- nrow(mat)
+  number_pca <- min(max_pcs, nrow(mat))
+  pca <- prcomp(correlation_matrix, rank. = number_pca)
+  
+  perc <- cumsum(pca$sdev^2) / sum(pca$sdev^2) * 100
+  
+  ggpubr::ggline(data.frame('variable' = 1:length(perc),
+                            'value' = perc), 
+         x = 'variable', 
+         y = 'value', 
+         plot_type = 'l',
+         legend = 'none') +
+    geom_segment(aes(x = mark, y = 0, xend = mark, yend = 100),
+                 color = 'black', linetype = 'dotted', size = 0.1)
+}
+
 #' Call hierarchical TADs
 #'
 #' Computes a constrained hierarchical clustering of genomic regions in a HiC experiment,
