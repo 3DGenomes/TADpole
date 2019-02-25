@@ -1,3 +1,7 @@
+#' Convert a 3-column data frame to a symmetric HiC matrix
+#'
+#' @param input_data `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.
+#' @export
 load_mat <- function(input_data){
     colnames(input_data) <- paste0('V', 1:3)
     mat <- reshape2::acast(input_data, V1 ~ V2, value.var = 'V3')
