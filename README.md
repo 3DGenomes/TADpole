@@ -78,14 +78,14 @@ To run the main funcion `call_HTADs`, you need to supply a `data.frame` with 3 c
 The basic usage looks like this
 ```
 load('data/chromosome18_10Mb.Rdata')
-htads <- call_hTADs(chromosome18_10Mb)
+htads <- call_HTADs(chromosome18_10Mb, method = 'accurate')
 ```
 
 #### 2.2.1) Parameters
 - **input_data**: `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.
 - **cores**: Numeric. When `method` is `"accurate"`, the number of cores to use for parallel execution.
 - **max_pcs**: Numeric. The maximum number of principal components to retain for the analysis. Default value is recommended.
-- **method**: Character. Which version of the algorithm to use. `"fast"` or `"accurate"`.
+- **method**: Character. Which version of the algorithm to use. `"fast"` (default) or `"accurate"`.
   
   -- ***Fast***
     - Performs a random search over all possible solutions.
