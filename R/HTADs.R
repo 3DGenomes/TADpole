@@ -196,7 +196,7 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200) {
 #' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
 
-call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 'accurate'), n_samples = 60, min_clusters = 2) {
+call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 2) {
   # Load and clean data.
   mat <- load_mat(input_data)
 
@@ -213,8 +213,8 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('fast', 
   # Find optimal clustering parameters based on Calinhara score.
   method <- match.arg(method)
   optimal_params <- switch(method,
-                           fast = find_params_fast(pca, number_pca, n_samples, min_clusters),
-                           accurate = find_params_accurate(pca, number_pca, cores, min_clusters))
+                           accurate = find_params_accurate(pca, number_pca, cores, min_clusters),
+                           fast = find_params_fast(pca, number_pca, n_samples, min_clusters))
 
   # Cluster the PCs subset with the best mean-CHI criterion.
   pcs <- as.matrix(pca$x[, 1:optimal_params$n_PCs])
