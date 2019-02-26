@@ -19,7 +19,7 @@ sparse_cor <- function(x) {
 
 find_params_accurate <- function(pca, number_pca, cores, min_clusters) {
   doParallel::registerDoParallel(cores = cores)
-  calinhara_score <- foreach::foreach(i = 1:number_pca) %dopar% {
+  calinhara_score <- foreach::foreach(i = 1:number_pca) foreach::`%dopar%` {
     pcs <- as.matrix(pca$x[, 1:i])
     row.names(pcs) <- 1:nrow(pcs)
 
