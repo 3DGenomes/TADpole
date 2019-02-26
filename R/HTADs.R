@@ -19,7 +19,7 @@ sparse_cor <- function(x) {
 
 find_params_accurate <- function(pca, number_pca, cores, min_clusters) {
   doParallel::registerDoParallel(cores = cores)
-  calinhara_score <- foreach::foreach(i = 1:number_pca) foreach::`%dopar%` {
+  calinhara_score <- foreach::`%dopar%`(foreach::foreach(i = 1:number_pca), {
     pcs <- as.matrix(pca$x[, 1:i])
     row.names(pcs) <- 1:nrow(pcs)
 
@@ -37,7 +37,7 @@ find_params_accurate <- function(pca, number_pca, cores, min_clusters) {
     }
 
     score
-  }
+  })
 
   scores <- matrix(NA, nrow = length(calinhara_score), ncol = max(sapply(calinhara_score, length)))
   for (pc in 1:length(calinhara_score)) scores[pc, 1:length(calinhara_score[[pc]])] <- calinhara_score[[pc]]
