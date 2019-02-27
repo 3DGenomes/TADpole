@@ -157,22 +157,22 @@ plot_dendro <- function(htads) {
 
 plot_var <- function(input_data, max_pcs = NULL, mark = 200) {
   mat <- load_mat(input_data)
-  
+
   # Sparse matrix and correlation.
   correlation_matrix <- sparse_cor(mat)$cor
   correlation_matrix[is.na(correlation_matrix)] <- 0 # Clean NA/NaN values.
-  
+
   # PCA (compute first `number_pca` components).
   if (is.null(max_pcs)) max_pcs <- nrow(mat)
   number_pca <- min(max_pcs, nrow(mat))
   pca <- prcomp(correlation_matrix, rank. = number_pca)
-  
+
   perc <- cumsum(pca$sdev^2) / sum(pca$sdev^2) * 100
-  
+
   ggpubr::ggline(data.frame('variable' = 1:length(perc),
-                            'value' = perc), 
-         x = 'variable', 
-         y = 'value', 
+                            'value' = perc),
+         x = 'variable',
+         y = 'value',
          plot_type = 'l',
          legend = 'none') +
     geom_segment(aes(x = mark, y = 0, xend = mark, yend = 100),
@@ -188,7 +188,7 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200) {
 #' @param max_pcs The maximum number of principal components to retain for the analysis.
 #' @param method Which version of the algorithm to use.
 #' @param n_samples When `method` is `"fast"`, the number of samples used to approximate the optimal solution.
-#' @param min_clusters ###### WRITE THIS UP ######.
+#' @param min_clusters Minimum number of clusters into which partition the chromosome.
 #' @param plot Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
 #' @return `htad` object that defines the clustering of genomic regions.
 #' @examples
@@ -196,7 +196,7 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200) {
 #' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
 
-call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 2) {
+call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 1) {
   # Load and clean data.
   mat <- load_mat(input_data)
 

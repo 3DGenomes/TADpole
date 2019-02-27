@@ -4,8 +4,8 @@
 \alias{call_HTADs}
 \title{Call hierarchical TADs}
 \usage{
-call_HTADs(input_data, cores = 1, max_pcs = 200, method = c("fast",
-  "accurate"), n_samples = 60)
+call_HTADs(input_data, cores = 1, max_pcs = 200,
+  method = c("accurate", "fast"), n_samples = 60, min_clusters = 1)
 }
 \arguments{
 \item{input_data}{`data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.}
@@ -17,6 +17,8 @@ call_HTADs(input_data, cores = 1, max_pcs = 200, method = c("fast",
 \item{method}{Which version of the algorithm to use.}
 
 \item{n_samples}{When `method` is `"fast"`, the number of samples used to approximate the optimal solution.}
+
+\item{min_clusters}{Minimum number of clusters into which partition the chromosome.}
 
 \item{plot}{Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.}
 }
