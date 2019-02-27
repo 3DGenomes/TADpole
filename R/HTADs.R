@@ -143,6 +143,7 @@ plot_borders <- function(htads, input_data) {
 
 plot_dendro <- function(htads) {
     plot(htads$dendro, labels = FALSE, hang = -1)
+    rect.hclust(htads$dendro, k = htads$optimal_n_clusters)
 }
 
 #' Plot retained variance
