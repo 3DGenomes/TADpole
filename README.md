@@ -26,7 +26,7 @@ devtools::install_github("paulasoler/HTADs")
 
 - First, get the latest version of the source code
 
-You can do this with _wget_:
+by using _wget_:
 
 ```
 wget https://github.com/paulasoler/HTADs/archive/master.zip
@@ -34,7 +34,7 @@ unzip master.zip
 mv master HTADs
 ```
 
-Or by cloning the repository:
+or by cloning the repository:
 
 ```
 git clone https://github.com/paulasoler/HTADs.git
@@ -146,7 +146,6 @@ start end
 The optimal segmentation can be overlayed on a symmetric HiC matrix to visualize the called TADs
 
 ```
-matrix_chr18_10Mb <- load_mat(chromosome18_10Mb)
 plot_borders(matrix_chr18_10Mb, htads)
 ```
 
