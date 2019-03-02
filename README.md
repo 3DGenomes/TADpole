@@ -24,7 +24,7 @@ devtools::install_github("paulasoler/HTADs")
 ### 1.2) Manual installation from source
 -->
 
-- First, get the latest version of the source code
+- First, get the latest version of the source code from Github
 
 by using _wget_:
 
@@ -40,7 +40,7 @@ or by cloning the repository:
 git clone https://github.com/paulasoler/HTADs.git
 ```
 
-- Then, install the package
+- Finally, install the package
 
 ```
 R CMD INSTALL HTADs
@@ -48,9 +48,9 @@ R CMD INSTALL HTADs
 
 ## 2) Getting started
 
-For the purposes of this tutorial, we provide a subset of a public HiC data set (SRA: [SRR1658602](https://www.ebi.ac.uk/ena/data/view/SRR1658602)).
+In this tutorial, we provide a publicly available HiC data set (SRA: [SRR1658602](https://www.ebi.ac.uk/ena/data/view/SRR1658602)).
 
-Inside the `data/` directory, there are 3 slices of chromosome 18, one of them corresponding to the full chromosome, and the others representing regions of 10 and 6 Mb (at 40 kb of resolution):
+In the `data/` directory, there are 3 regions of chromosome 18 binned at 40kb, one corresponding to the full chromosome, and the others representing regions of 10Mb and 6 Mb:
 
 ```
 - data/chromosome18_74Mb.Rdata
@@ -60,12 +60,12 @@ Inside the `data/` directory, there are 3 slices of chromosome 18, one of them c
 
 ![Zoom](https://github.com/paulasoler/HTADs/blob/master/misc/zoom_pictures.png)
 
-To obtain this interaction matrices, we processed the HiC data using the [TADbit](https://github.com/3DGenomes/TADbit) Python library, that deals with all the necessary steps to normalize, analyze, model and explore 3C-based data. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it corrects for known experimental biases.
+To obtain this interaction matrices, we processed the HiC data using the [TADbit](https://github.com/3DGenomes/TADbit) Python library, that deals with all the necessary steps to analyse and normalize 3C-based datasets. 
 
-In this tutorial, we are going to use **chromosome18_10Mb.tsv** as a template but you have the possibility to run a complete chromosome (*chromosome18_74Mb.tsv*) or a smaler data set (*chromosome18_6Mb.tsv*).
+In this tutorial, we are going to use **chromosome18_10Mb.tsv**.
 
 ### 2.1) Input data
-To run the main funcion `call_HTADs`, you need to supply a `data.frame` with 3 columns. The first and second columns correspond to each pair of bins _(i, j)_ and the third column is their interaction frequency.
+To run the main funcion `call_HTADs`, you need to provide a `data.frame` with 3 columns. The first two columns correspond to the pair of bins _(i, j)_ and the third column is their 3C-based interaction score. This score can be the raw or the normalised interaction count. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it effectively corrects for known experimental biases. 
 
 ```
 28 27 1108.4257768
@@ -75,16 +75,16 @@ To run the main funcion `call_HTADs`, you need to supply a `data.frame` with 3 c
 ```
 
 ### 2.2) Running the algorithm
-The basic usage looks like this
+The basic usage is the following:
 ```
 load('data/chromosome18_10Mb.Rdata')
 htads <- call_HTADs(chromosome18_10Mb, method = 'accurate')
 ```
 
 #### 2.2.1) Parameters
-- **input_data**: `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.
+- **input_data**: `data.frame` with 3 columns containing the 3C-based dataset in the format `(bin1, bin2, score)`.
 - **cores**: Numeric. When `method` is `"accurate"`, the number of cores to use for parallel execution.
-- **max_pcs**: Numeric. The maximum number of principal components to retain for the analysis. Default value is recommended.
+- **max_pcs**: Numeric. The maximum number of principal components to retain for the analysis. Default value of 200 is recommended.
 - **method**: Character. Which version of the algorithm to use. `"accurate"` (default) or `"fast"`.
 
   -- ***Accurate***
