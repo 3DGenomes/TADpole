@@ -54,13 +54,6 @@ load_mat <- function(input_data, bad.column.percent = 0.95) {
     list(mat_clean, bad.columns)
 }
 
-# load_mat <- function(input_data){
-#     colnames(input_data) <- paste0('V', 1:3)
-#     mat <- reshape2::acast(input_data, V1 ~ V2, value.var = 'V3')
-#     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
-#     as.matrix(Matrix::forceSymmetric(mat, uplo = 'L'))
-# }
-
 sparse_cor <- function(x) {
   # Create a sparse correlation matrix.
   covmat <- (crossprod(as.matrix(x)) - nrow(x) * tcrossprod(colMeans(x))) / (nrow(x) - 1)
@@ -195,6 +188,7 @@ plot_borders <- function(htads, input_data) {
 
 plot_dendro <- function(htads) {
     plot(htads$dendro, labels = FALSE, hang = -1)
+    rect.hclust(htads$dendro, k = htads$optimal_n_clusters)
 }
 
 #' Plot retained variance
