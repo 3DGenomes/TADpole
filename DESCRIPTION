@@ -12,6 +12,7 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     doParallel (>= 1.0.14),
+    DescTools (>= 0.99.28),
     fpc (>= 2.1-11.1),
     ggpubr (>= 0.1.8),
     lattice (>= 0.20-35),

@@ -1,13 +1,65 @@
+estimate_resolution <- function(input_data) {
+    resolution <- DescTools::GCD(input_data$V1, input_data$V2)
+    print(paste('Estimated resolution:', resolution))
+    resolution
+}
+
 #' Convert a 3-column data frame to a symmetric HiC matrix
 #'
 #' @param input_data `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.
+#' @param empty_frac maximum fraction of empty bins allowed in a row/column.
 #' @export
-load_mat <- function(input_data){
+
+load_mat <- function(input_data, bad.column.percent = 0.95) {
     colnames(input_data) <- paste0('V', 1:3)
-    mat <- reshape2::acast(input_data, V1 ~ V2, value.var = 'V3')
+
+    # Build the full matrix by filling the missing coordinates.
+    mat_coordinates <- unique(c(input_data$V1, input_data$V2))
+    all_coordinates <- seq(min(mat_coordinates), max(mat_coordinates), estimate_resolution(input_data))
+    full_df <- expand.grid(all_coordinates, all_coordinates)
+    colnames(full_df) <- c('V1', 'V2')
+    full_df$V3 <- 0
+    mat <- xtabs(V3 ~ V1 + V2, aggregate(V3 ~ V1 + V2, rbind(input_data, full_df), sum))
+    mat <- as.matrix(mat)
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
-    as.matrix(Matrix::forceSymmetric(mat, uplo = 'L'))
+
+    # Check matrix symmetry.
+    lower <- c(mat[lower.tri(mat)])
+    upper <- c(mat[upper.tri(mat)])
+
+    if (sum(lower) & sum(upper) & sum(lower) != sum(upper)) stop('Input matrix is not symmetric!')
+
+    if (sum(lower) == sum(upper)) {
+        print('Input matrix is already symmetric.')
+    } else if (!sum(upper)) {
+        print('Filling the upper triangle of the matrix')
+        mat = as.matrix(Matrix::forceSymmetric(mat, uplo = 'L'))
+    } else if (!sum(lower)) {
+        print('Filling the lower triangle of the matrix')
+        mat = as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
+    }
+
+    # Detect bad columns.
+    df = as.data.frame(mat)
+    perc_zeros = as.data.frame(as.data.table(df)[, lapply(.SD, function(x) sum(x==0) / nrow(df))])
+    bad.columns = as.vector(names(perc_zeros)[apply(perc_zeros, 1, function(i) which(i  > percent))])
+    print(paste("Number of bad columns:",length(bad.columns)))
+
+    if (length(bad.columns)){
+        print("Positions of bad columns:")
+        print(bad.columns)
+        df = (df[ , -which(names(df) %in% bad.columns)])
+        mat_clean = as.matrix(df[ !(rownames(df) %in% bad.columns), ])} else { mat_clean = mat}
+
+    list(mat_clean, bad.columns)
 }
+
+# load_mat <- function(input_data){
+#     colnames(input_data) <- paste0('V', 1:3)
+#     mat <- reshape2::acast(input_data, V1 ~ V2, value.var = 'V3')
+#     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
+#     as.matrix(Matrix::forceSymmetric(mat, uplo = 'L'))
+# }
 
 sparse_cor <- function(x) {
   # Create a sparse correlation matrix.
