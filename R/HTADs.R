@@ -10,7 +10,7 @@ estimate_resolution <- function(input_data) {
 #' @param empty_frac maximum fraction of empty bins allowed in a row/column.
 #' @export
 
-load_mat <- function(input_data, bad.column.percent = 0.95) {
+load_mat <- function(input_data, empty_frac = 0.95) {
     colnames(input_data) <- paste0('V', 1:3)
 
     # Build the full matrix by filling the missing coordinates.
@@ -30,7 +30,7 @@ load_mat <- function(input_data, bad.column.percent = 0.95) {
     if (sum(lower) & sum(upper) & sum(lower) != sum(upper)) stop('Input matrix is not symmetric!')
 
     if (sum(lower) == sum(upper)) {
-        print('Input matrix is already symmetric.')
+        print('Input matrix is already symmetric. Doing nothing.')
     } else if (!sum(upper)) {
         print('Filling the upper triangle of the matrix')
         mat = as.matrix(Matrix::forceSymmetric(mat, uplo = 'L'))
@@ -41,14 +41,16 @@ load_mat <- function(input_data, bad.column.percent = 0.95) {
 
     # Detect bad columns.
     df = as.data.frame(mat)
-    perc_zeros = as.data.frame(as.data.table(df)[, lapply(.SD, function(x) sum(x==0) / nrow(df))])
-    bad.columns = as.vector(names(perc_zeros)[apply(perc_zeros, 1, function(i) which(i  > percent))])
+    # perc_zeros = as.data.frame(data.table::as.data.table(df)[, lapply(data.table::.SD, function(x) sum(x==0) / nrow(df))])
+    bad.columns <- names(which(rowMeans(mat == 0) > empty_frac))
+    # bad.columns = as.vector(names(perc_zeros)[apply(perc_zeros, 1, function(i, empty_frac) which(i  > empty_frac), empty_frac)])
+    # print(perc_zeros)
     print(paste("Number of bad columns:",length(bad.columns)))
 
     if (length(bad.columns)){
         print("Positions of bad columns:")
         print(bad.columns)
-        df = (df[ , -which(names(df) %in% bad.columns)])
+        df = df[ , -which(names(df) %in% bad.columns)]
         mat_clean = as.matrix(df[ !(rownames(df) %in% bad.columns), ])} else { mat_clean = mat}
 
     list(mat_clean, bad.columns)
@@ -76,6 +78,7 @@ find_params_accurate <- function(pca, number_pca, cores, min_clusters) {
     n_cluster <- r$lengths[r$values][1]
 
     score <- rep(NA, n_cluster)
+    min_clusters <- min(min_clusters, n_cluster)
     for (n in min_clusters:n_cluster) {
       chc <- cutree(clust, k = n)
       score[n] <- fpc::calinhara(pca$x, chc, cn = n)
@@ -163,8 +166,8 @@ plot_scores <- function(htads, file = NULL) {
 #' plot_borders(htads, chromosome18_10Mb)
 #' @export
 
-plot_borders <- function(htads, input_data) {
-    mat <- load_mat(input_data)
+plot_borders <- function(htads, input_data, percent = 1) {
+    mat <- load_mat(input_data, percent)[[1]]
     start_coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$start
     colors <- colorRampPalette(c('white', 'firebrick3'))
 
@@ -187,8 +190,8 @@ plot_borders <- function(htads, input_data) {
 #' @export
 
 plot_dendro <- function(htads) {
-    plot(htads$dendro, labels = FALSE, hang = -1)
-    rect.hclust(htads$dendro, k = htads$optimal_n_clusters)
+    plot(cut(as.dendrogram(htads$dendro), h = htads$optimal_n_clusters)$upper, labels = FALSE, hang = -1)
+    # rect.hclust(htads$dendro, k = htads$optimal_n_clusters)
 }
 
 #' Plot retained variance
@@ -201,8 +204,8 @@ plot_dendro <- function(htads) {
 #' plot_var(chromosome18_10Mb)
 #' @export
 
-plot_var <- function(input_data, max_pcs = NULL, mark = 200) {
-  mat <- load_mat(input_data)
+plot_var <- function(input_data, max_pcs = NULL, mark = 200, percent = 0.8) {
+  mat <- load_mat(input_data, percent)[[1]]
 
   # Sparse matrix and correlation.
   correlation_matrix <- sparse_cor(mat)$cor
@@ -221,8 +224,8 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200) {
          y = 'value',
          plot_type = 'l',
          legend = 'none') +
-    geom_segment(aes(x = mark, y = 0, xend = mark, yend = 100),
-                 color = 'black', linetype = 'dotted', size = 0.1)
+    ggplot2::geom_segment(ggplot2::aes(x = mark, y = 0, xend = mark, yend = 100),
+                         color = 'black', linetype = 'dotted', size = 0.1)
 }
 
 #' Call hierarchical TADs
@@ -242,13 +245,13 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200) {
 #' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
 
-call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 1) {
+call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 3, percent = 0.8) {
   # Load and clean data.
-  mat <- load_mat(input_data)
+    matrix_loading <- load_mat(input_data,percent)
+    mat <- matrix_loading[[1]]
+    bad.columns <- matrix_loading[[2]]
 
   # Sparse matrix and correlation.
-  # sparse_matrix <- Matrix::Matrix(mat , sparse = TRUE)
-  # correlation_matrix <- sparse_cor(sparse_matrix)$cor
   correlation_matrix <- sparse_cor(mat)$cor
   correlation_matrix[is.na(correlation_matrix)] <- 0 # Clean NA/NaN values.
 
@@ -264,7 +267,6 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
 
   # Cluster the PCs subset with the best mean-CHI criterion.
   pcs <- as.matrix(pca$x[, 1:optimal_params$n_PCs])
-  row.names(pcs) <- 1:nrow(pcs)
   clust <- rioja::chclust(dist(pcs))
 
   # Create hierarchical cluster object.
@@ -275,11 +277,52 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
                           'scores' = optimal_params$scores),
                      class = 'htads')
   for (n in which(!is.na(optimal_params$scores[optimal_params$n_PCs, ]))) {
-    eb <- cumsum(table(cutree(clust, k = n)))
-    htads$clusters[[as.character(n)]] <- list('CH-index' = optimal_params$scores[optimal_params$n_PCs, n],
-                                              'coord' = data.frame('start' = c(1, eb[-length(eb)] + 1, use.names = FALSE),
-                                                                   'end' = eb))
+      cutree_wo_bad.columns = as.data.frame(cutree(clust, k = n))
+      colnames(cutree_wo_bad.columns) = c("cluster_pos")
+
+      if (length(bad.columns)){
+          # Adding bad columns to the defined clusters
+          bad.columns_df = data.frame(rep(0,length(bad.columns)))
+          colnames(bad.columns_df) = c("cluster_pos")
+          row.names(bad.columns_df) = bad.columns
+
+          # Rbind bad columns with the original data and sorted by row.names
+          complete_df = rbind(cutree_wo_bad.columns,bad.columns_df)
+          df.sort <- complete_df[order(as.numeric(as.character(row.names(complete_df)))), , drop=FALSE]
+          aa = rle(df.sort$cluster_pos)
+          aa$values = correct_vector(aa)
+          add_bad_columns = inverse.rle(aa)
+          eb <- cumsum(rle(add_bad_columns)$length)
+
+          coord = data.frame('start' = c(1, eb[-length(eb)] + 1, use.names = FALSE), 'end' = eb)
+          coord$values = rle(add_bad_columns)$values
+          coord = coord[coord$values != 0,][,1:2]}
+
+      else {
+          eb <- cumsum(table(cutree_wo_bad.columns))
+          coord = data.frame('start' = c(1, eb[-length(eb)] + 1, use.names = FALSE),
+                             'end' = eb)}
+
+      htads$clusters[[as.character(n)]] <- list('CH-index' = optimal_params$scores[optimal_params$n_PCs, n],
+                                                'coord' = coord)
   }
 
   htads
+}
+
+correct_vector <- function(rle_object){
+    rle_object = rle_object$values
+    zero_position = which(rle_object == 0)
+    zero_position2 <- zero_position[!zero_position %in% 0:1]
+
+    for (i in zero_position2){
+        if (rle_object[i-1] == rle_object[i+1]){
+            rle_object[i] = rle_object[i-1]
+            return(rle_object)
+        }
+        if (rle_object[i-1] != rle_object[i+1]){
+            rle_object[i] = rle_object[i]
+            return(rle_object)
+        }
+    }
 }
