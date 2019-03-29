@@ -4,7 +4,7 @@
 \alias{plot_borders}
 \title{Plot TAD borders on a HiC matrix}
 \usage{
-plot_borders(htads, input_data)
+plot_borders(htads, input_data, percent = 1)
 }
 \arguments{
 \item{htads}{`htad` object returned by `call_HTADs`.}

@@ -4,7 +4,7 @@
 \alias{plot_var}
 \title{Plot retained variance}
 \usage{
-plot_var(input_data, max_pcs = NULL, mark = 200)
+plot_var(input_data, max_pcs = NULL, mark = 200, percent = 0.8)
 }
 \arguments{
 \item{input_data}{`data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.}
