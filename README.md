@@ -24,7 +24,7 @@ devtools::install_github("paulasoler/HTADs")
 ### 1.2) Manual installation from source
 -->
 
-- First, install all the required dependencies from within R
+- First, install the required dependencies from within R
 
 ```
 install.packages('DescTools', 'doParallel', 'fpc', 'ggpubr', 'lattice', 'Matrix', 'rioja')
@@ -36,8 +36,8 @@ by using _wget_:
 
 ```
 wget https://github.com/paulasoler/HTADs/archive/master.zip
-unzip master.zip
-mv master HTADs
+unzip HTADs-master.zip
+mv HTADs-master HTADs
 ```
 
 or by cloning the repository:
