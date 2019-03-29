@@ -24,7 +24,13 @@ devtools::install_github("paulasoler/HTADs")
 ### 1.2) Manual installation from source
 -->
 
-- First, get the latest version of the source code from Github
+- First, install all the required dependencies from within R
+
+```
+install.packages('DescTools', 'doParallel', 'fpc', 'ggpubr', 'lattice', 'Matrix', 'rioja')
+```
+
+- Then, get the latest version of the source code from Github
 
 by using _wget_:
 
@@ -60,12 +66,12 @@ In the `data/` directory, there are 3 regions of chromosome 18 binned at 40kb, o
 
 ![Zoom](https://github.com/paulasoler/HTADs/blob/master/misc/zoom_pictures.png)
 
-To obtain this interaction matrices, we processed the HiC data using the [TADbit](https://github.com/3DGenomes/TADbit) Python library, that deals with all the necessary steps to analyse and normalize 3C-based datasets. 
+To obtain this interaction matrices, we processed the HiC data using the [TADbit](https://github.com/3DGenomes/TADbit) Python library, that deals with all the necessary steps to analyse and normalize 3C-based datasets.
 
 In this tutorial, we are going to use **chromosome18_10Mb.tsv**.
 
 ### 2.1) Input data
-To run the main funcion `call_HTADs`, you need to provide a `data.frame` with 3 columns. The first two columns correspond to the pair of bins _(i, j)_ and the third column is their 3C-based interaction score. This score can be the raw or the normalised interaction count. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it effectively corrects for known experimental biases. 
+To run the main funcion `call_HTADs`, you need to provide a `data.frame` with 3 columns. The first two columns correspond to the pair of bins _(i, j)_ and the third column is their 3C-based interaction score. This score can be the raw or the normalised interaction count. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it effectively corrects for known experimental biases.
 
 ```
 28 27 1108.4257768

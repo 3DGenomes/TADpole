@@ -17,7 +17,6 @@ Imports:
     ggpubr (>= 0.1.8),
     lattice (>= 0.20-35),
     Matrix (>= 1.2-15),
-    reshape2 (>= 1.4.3),
     rioja (>= 0.9-15.1)
 Depends:
     R (>= 3.5.2)
