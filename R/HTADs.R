@@ -10,7 +10,7 @@ estimate_resolution <- function(input_data) {
 #' @param empty_frac maximum fraction of empty bins allowed in a row/column.
 #' @export
 
-load_mat <- function(input_data, empty_frac = 0.95) {
+load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE) {
     colnames(input_data) <- paste0('V', 1:3)
 
     # Build the full matrix by filling the missing coordinates.
@@ -40,20 +40,21 @@ load_mat <- function(input_data, empty_frac = 0.95) {
     }
 
     # Detect bad columns.
-    df = as.data.frame(mat)
-    # perc_zeros = as.data.frame(data.table::as.data.table(df)[, lapply(data.table::.SD, function(x) sum(x==0) / nrow(df))])
-    bad.columns <- names(which(rowMeans(mat == 0) > empty_frac))
-    # bad.columns = as.vector(names(perc_zeros)[apply(perc_zeros, 1, function(i, empty_frac) which(i  > empty_frac), empty_frac)])
-    # print(perc_zeros)
-    print(paste("Number of bad columns:",length(bad.columns)))
+    # bad_columns <- diag(mat) == 0 | rowMeans(mat == 0) > empty_frac)
+    r <- rowMeans(mat)
+    bad_columns <- diag(mat) == 0 | r < quantile(r, seq(0, 1, by = bad_frac))[2]
 
-    if (length(bad.columns)){
-        print("Positions of bad columns:")
-        print(bad.columns)
-        df = df[ , -which(names(df) %in% bad.columns)]
-        mat_clean = as.matrix(df[ !(rownames(df) %in% bad.columns), ])} else { mat_clean = mat}
+    if (plot_hist) hist(r, breaks = 50)
 
-    list(mat_clean, bad.columns)
+    if (any(bad_columns)) {
+        mat <- mat[!bad_columns, !bad_columns]
+        attr(mat, 'bad_columns') <- names(which(bad_columns))
+
+        print(paste(sum(bad_columns), 'bad columns found at position(s):'))
+        print(attr(mat, 'bad_columns'))
+    }
+
+    mat
 }
 
 sparse_cor <- function(x) {
@@ -245,11 +246,10 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200, percent = 0.8) {
 #' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
 
-call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 3, percent = 0.8) {
+call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 3, bad_frac = 0.01) {
   # Load and clean data.
-    matrix_loading <- load_mat(input_data,percent)
-    mat <- matrix_loading[[1]]
-    bad.columns <- matrix_loading[[2]]
+  mat <- load_mat(input_data, bad_frac)
+  bad_columns <- attr(mat, 'bad_columns')
 
   # Sparse matrix and correlation.
   correlation_matrix <- sparse_cor(mat)$cor
@@ -276,32 +276,32 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
                           'clusters' = list(),
                           'scores' = optimal_params$scores),
                      class = 'htads')
+
   for (n in which(!is.na(optimal_params$scores[optimal_params$n_PCs, ]))) {
-      cutree_wo_bad.columns = as.data.frame(cutree(clust, k = n))
-      colnames(cutree_wo_bad.columns) = c("cluster_pos")
+      good_clusters <- cutree(clust, k = n)
 
-      if (length(bad.columns)){
-          # Adding bad columns to the defined clusters
-          bad.columns_df = data.frame(rep(0,length(bad.columns)))
-          colnames(bad.columns_df) = c("cluster_pos")
-          row.names(bad.columns_df) = bad.columns
+      if (!is.null(bad_columns)) {
+          # Add bad columns to the clusters.
+          bad_clusters <- rep(0, length(bad_columns))
+          names(bad_clusters) <- bad_columns
 
-          # Rbind bad columns with the original data and sorted by row.names
-          complete_df = rbind(cutree_wo_bad.columns,bad.columns_df)
-          df.sort <- complete_df[order(as.numeric(as.character(row.names(complete_df)))), , drop=FALSE]
-          aa = rle(df.sort$cluster_pos)
-          aa$values = correct_vector(aa)
-          add_bad_columns = inverse.rle(aa)
-          eb <- cumsum(rle(add_bad_columns)$length)
+          # Merge bad columns with the original data.
+          clusters <- c(good_clusters, bad_clusters)
+          clusters <- clusters[order(as.numeric(names(clusters)))]
 
-          coord = data.frame('start' = c(1, eb[-length(eb)] + 1, use.names = FALSE), 'end' = eb)
-          coord$values = rle(add_bad_columns)$values
-          coord = coord[coord$values != 0,][,1:2]}
+          rle_clusters <- rle(clusters)
+          rle_clusters$values <- fix_values(rle_clusters)
+          fixed_clusters <- inverse.rle(rle_clusters)
 
-      else {
-          eb <- cumsum(table(cutree_wo_bad.columns))
-          coord = data.frame('start' = c(1, eb[-length(eb)] + 1, use.names = FALSE),
-                             'end' = eb)}
+          eb <- cumsum(rle(fixed_clusters)$length)
+          coord <- data.frame('start' = c(1, eb[-length(eb)] + 1, use.names = FALSE),
+                              'end' = eb)
+          coord <- coord[rle(fixed_clusters)$values != 0, ]
+      } else {
+          eb <- cumsum(table(good_clusters))
+          coord <- data.frame('start' = c(1, eb[-length(eb)] + 1, use.names = FALSE),
+                              'end' = eb)
+      }
 
       htads$clusters[[as.character(n)]] <- list('CH-index' = optimal_params$scores[optimal_params$n_PCs, n],
                                                 'coord' = coord)
@@ -310,7 +310,7 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
   htads
 }
 
-correct_vector <- function(rle_object){
+fix_values <- function(rle_object){
     rle_object = rle_object$values
     zero_position = which(rle_object == 0)
     zero_position2 <- zero_position[!zero_position %in% 0:1]
