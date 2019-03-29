@@ -310,19 +310,11 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
   htads
 }
 
-fix_values <- function(rle_object){
-    rle_object = rle_object$values
-    zero_position = which(rle_object == 0)
-    zero_position2 <- zero_position[!zero_position %in% 0:1]
-
-    for (i in zero_position2){
-        if (rle_object[i-1] == rle_object[i+1]){
-            rle_object[i] = rle_object[i-1]
-            return(rle_object)
-        }
-        if (rle_object[i-1] != rle_object[i+1]){
-            rle_object[i] = rle_object[i]
-            return(rle_object)
-        }
+fix_values <- function(r) {
+    zeros <- which(r$values == 0)
+    zeros <- zeros[zeros != 1 & zeros != length(r$values)]
+    for (i in zeros) {
+        if (r$values[i - 1] == r$values[i + 1]) r$values[i] <- r$values[i - 1]
     }
+    r
 }
