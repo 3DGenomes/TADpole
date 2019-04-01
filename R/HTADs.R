@@ -42,7 +42,8 @@ load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE) {
     # Detect bad columns.
     # bad_columns <- diag(mat) == 0 | rowMeans(mat == 0) > empty_frac)
     r <- rowMeans(mat)
-    bad_columns <- diag(mat) == 0 | r < quantile(r, seq(0, 1, by = bad_frac))[2]
+    bad_columns <- diag(mat) == 0
+    if (bad_frac) bad_columns <- bad_columns | r < quantile(r, seq(0, 1, by = bad_frac))[2]
 
     if (plot_hist) hist(r, breaks = 50)
 
@@ -167,17 +168,18 @@ plot_scores <- function(htads, file = NULL) {
 #' plot_borders(htads, chromosome18_10Mb)
 #' @export
 
-plot_borders <- function(htads, input_data, percent = 1) {
-    mat <- load_mat(input_data, percent)[[1]]
+plot_borders <- function(htads, input_data) {
+    mat <- load_mat(input_data, bad_frac = 0)
     start_coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$start
+    end_coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$end
     colors <- colorRampPalette(c('white', 'firebrick3'))
 
     lattice::levelplot(as.matrix(log(mat)), col.regions = colors, scales = list(draw = FALSE), colorkey = FALSE,
                        xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
                        panel = function(...) {
                            lattice::panel.levelplot(...)
-                           lattice::panel.abline(h = start_coord, lty = 'dotted', col = 'black')
-                           lattice::panel.abline(v = start_coord, lty = 'dotted', col = 'black')
+                           lattice::panel.abline(h = unique(c(start_coord - 0.5, end_coord + 0.5)), lty = 'dotted', col = 'black')
+                           lattice::panel.abline(v = unique(c(start_coord - 0.5, end_coord + 0.5)), lty = 'dotted', col = 'black')
                        })
 }
 
@@ -246,7 +248,7 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200, percent = 0.8) {
 #' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
 
-call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 3, bad_frac = 0.01) {
+call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 1, bad_frac = 0.01) {
   # Load and clean data.
   mat <- load_mat(input_data, bad_frac)
   bad_columns <- attr(mat, 'bad_columns')
@@ -277,8 +279,8 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
                           'scores' = optimal_params$scores),
                      class = 'htads')
 
-  for (n in which(!is.na(optimal_params$scores[optimal_params$n_PCs, ]))) {
-      good_clusters <- cutree(clust, k = n)
+  for (k in which(!is.na(optimal_params$scores[optimal_params$n_PCs, ]))) {
+      good_clusters <- cutree(clust, k = k)
 
       if (!is.null(bad_columns)) {
           # Add bad columns to the clusters.
@@ -289,8 +291,7 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
           clusters <- c(good_clusters, bad_clusters)
           clusters <- clusters[order(as.numeric(names(clusters)))]
 
-          rle_clusters <- rle(clusters)
-          rle_clusters$values <- fix_values(rle_clusters)
+          rle_clusters <- fix_values(rle(clusters))
           fixed_clusters <- inverse.rle(rle_clusters)
 
           eb <- cumsum(rle(fixed_clusters)$length)
@@ -303,7 +304,7 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
                               'end' = eb)
       }
 
-      htads$clusters[[as.character(n)]] <- list('CH-index' = optimal_params$scores[optimal_params$n_PCs, n],
+      htads$clusters[[as.character(k)]] <- list('CH-index' = optimal_params$scores[optimal_params$n_PCs, k],
                                                 'coord' = coord)
   }
 
