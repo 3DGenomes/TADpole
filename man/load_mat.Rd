@@ -4,7 +4,8 @@
 \alias{load_mat}
 \title{Convert a 3-column data frame to a symmetric HiC matrix}
 \usage{
-load_mat(input_data, bad_frac = 0.01, plot_hist = FALSE)
+load_mat(input_data, bad_frac = 0.01, plot_hist = FALSE,
+  check = TRUE)
 }
 \arguments{
 \item{input_data}{`data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.}

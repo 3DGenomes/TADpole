@@ -5,8 +5,8 @@
 \title{Call hierarchical TADs}
 \usage{
 call_HTADs(input_data, cores = 1, max_pcs = 200,
-  method = c("accurate", "fast"), n_samples = 60, min_clusters = 3,
-  bad_frac = 0.01)
+  method = c("accurate", "fast"), n_samples = 60, min_clusters = 1,
+  bad_frac = 0.01, check = TRUE)
 }
 \arguments{
 \item{input_data}{`data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.}
