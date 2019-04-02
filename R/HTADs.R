@@ -10,7 +10,7 @@ estimate_resolution <- function(input_data) {
 #' @param empty_frac maximum fraction of empty bins allowed in a row/column.
 #' @export
 
-load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE) {
+load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE, check = TRUE) {
     colnames(input_data) <- paste0('V', 1:3)
 
     # Build the full matrix by filling the missing coordinates.
@@ -27,9 +27,7 @@ load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE) {
     lower <- c(mat[lower.tri(mat)])
     upper <- c(mat[upper.tri(mat)])
 
-    if (sum(lower) & sum(upper) & sum(lower) != sum(upper)) stop('Input matrix is not symmetric!')
-
-    if (sum(lower) == sum(upper)) {
+    if (isSymmetric(mat)) {
         print('Input matrix is already symmetric. Doing nothing.')
     } else if (!sum(upper)) {
         print('Filling the upper triangle of the matrix')
@@ -37,7 +35,7 @@ load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE) {
     } else if (!sum(lower)) {
         print('Filling the lower triangle of the matrix')
         mat = as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
-    }
+    } else if (check) stop('Input matrix is not symmetric!')
 
     # Detect bad columns.
     # bad_columns <- diag(mat) == 0 | rowMeans(mat == 0) > empty_frac)
@@ -248,9 +246,9 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200, percent = 0.8) {
 #' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
 
-call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 1, bad_frac = 0.01) {
+call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 1, bad_frac = 0.01, check = TRUE) {
   # Load and clean data.
-  mat <- load_mat(input_data, bad_frac)
+  mat <- load_mat(input_data, bad_frac = bad_frac, check = check)
   bad_columns <- attr(mat, 'bad_columns')
 
   # Sparse matrix and correlation.
