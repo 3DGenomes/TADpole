@@ -134,6 +134,27 @@ find_params_fast <- function(pca, number_pca, n_samples, min_clusters) {
   list(n_PCs = optimal_PCs, n_clusters = optimal_n_clusters, scores = scores)
 }
 
+#' Save Bed file with the TAD's borders coordinates.
+#'
+#' @param htads `htad` object returned by `call_HTADs`.
+#' @param chrom `character` with the name of the chromosome("chrX").
+#' @param file path to save the file in bed format. 
+#' @examples
+#' load('data/chromosome18_10Mb.Rdata')
+#' htads <- call_HTADs(chromosome18_10Mb)
+#' save_bed_coordinates(htads,chrom = "chr18","/scratch/User/chr18_borders.bed")
+#' @export
+
+save_bed_coordinates <- function(htads, chrom, output){
+    start_coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$start
+    end_coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$end
+    bed_format <- cbind(chrom,start_coord,end_coord)
+    write.table(bed_format,output, 
+                col.names = F, 
+                row.names = F, 
+                quote = F, sep = "\t")}
+
+
 #' Plot a heatmap of the Caliski-Harabasz index of every tested `n_pcs`/`n_clusters` combination
 #'
 #' @param htads `htad` object returned by `call_HTADs`.
