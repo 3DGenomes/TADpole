@@ -27,7 +27,7 @@ load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE, check = TRU
     lower <- c(mat[lower.tri(mat)])
     upper <- c(mat[upper.tri(mat)])
 
-    if (isSymmetric(mat)) {
+    if (isSymmetric(unname(mat))) {
         print('Input matrix is already symmetric. Doing nothing.')
     } else if (!sum(upper)) {
         print('Filling the upper triangle of the matrix')
@@ -138,7 +138,7 @@ find_params_fast <- function(pca, number_pca, n_samples, min_clusters) {
 #'
 #' @param htads `htad` object returned by `call_HTADs`.
 #' @param chrom `character` with the name of the chromosome("chrX").
-#' @param file path to save the file in bed format. 
+#' @param file path to save the file in bed format.
 #' @examples
 #' load('data/chromosome18_10Mb.Rdata')
 #' htads <- call_HTADs(chromosome18_10Mb)
@@ -149,9 +149,9 @@ save_bed_coordinates <- function(htads, chrom, output){
     start_coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$start
     end_coord <- htads$clusters[[as.character(htads$optimal_n_clusters)]]$coord$end
     bed_format <- cbind(chrom,start_coord,end_coord)
-    write.table(bed_format,output, 
-                col.names = F, 
-                row.names = F, 
+    write.table(bed_format,output,
+                col.names = F,
+                row.names = F,
                 quote = F, sep = "\t")}
 
 
@@ -323,6 +323,7 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
                               'end' = eb)
       }
 
+      row.names(coord) <- NULL
       htads$clusters[[as.character(k)]] <- list('CH-index' = optimal_params$scores[optimal_params$n_PCs, k],
                                                 'coord' = coord)
   }
