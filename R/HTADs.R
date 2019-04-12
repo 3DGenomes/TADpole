@@ -169,7 +169,7 @@ save_bed_coordinates <- function(htads, chrom, file = '') {
 plot_scores <- function(htads, file = NULL) {
     # Plot nPCs vs nClusters CHi.
     s <- htads$scores
-    p <- plotly::layout(plotly::plot_ly(z = s, type = "heatmap"),
+    p <- plotly::layout(plotly::plot_ly(z = s, type = 'heatmap'),
                         title = 'Caliski-Harabasz index',
                         xaxis = list(title = 'Number of clusters'),
                         yaxis = list(title = 'Number of PCs'))
