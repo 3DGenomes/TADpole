@@ -27,7 +27,7 @@ devtools::install_github("paulasoler/HTADs")
 - First, install the required dependencies from within R
 
 ```
-install.packages('DescTools', 'doParallel', 'fpc', 'ggpubr', 'lattice', 'Matrix', 'rioja')
+install.packages('DescTools', 'doParallel', 'fpc', 'ggpubr', 'Matrix', 'plotly')
 ```
 
 - Then, get the latest version of the source code from Github
