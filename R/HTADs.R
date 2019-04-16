@@ -10,7 +10,7 @@ estimate_resolution <- function(input_data) {
 #' @param empty_frac maximum fraction of empty bins allowed in a row/column.
 #' @export
 
-load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE, check = TRUE) {
+load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE) {
     colnames(input_data) <- paste0('V', 1:3)
 
     # Build the full matrix by filling the missing coordinates.
@@ -23,6 +23,15 @@ load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE, check = TRU
     mat <- as.matrix(mat)
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
 
+    # Supersample if matrix is too big. WARNING! Can produce aliasing!
+    if (nrow(mat) > 1e4) {
+        r <- raster::raster(mat)
+        raster::extent(r) <- raster::extent(c(1, 149, 1, 149))
+        s <- raster::raster(nrow = 50, ncol = 50)
+        raster::extent(s) <- raster::extent(c(1, 50, 1, 50))
+        as.matrix(raster::resample(r, s))
+    }
+
     # Check matrix symmetry.
     lower <- c(mat[lower.tri(mat)])
     upper <- c(mat[upper.tri(mat)])
@@ -32,15 +41,15 @@ load_mat <- function(input_data, bad_frac = 0.01, plot_hist = FALSE, check = TRU
     } else if (!sum(upper)) {
         print('Filling the upper triangle of the matrix')
         mat = as.matrix(Matrix::forceSymmetric(mat, uplo = 'L'))
-    } else if (!sum(lower)) {
+    } else { # Use default U value, if the lower matrix is empty or if the matrix is somehow not symmetric.
         print('Filling the lower triangle of the matrix')
         mat = as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
-    } else if (check) stop('Input matrix is not symmetric!')
+    }
 
     # Detect bad columns.
-    # bad_columns <- diag(mat) == 0 | rowMeans(mat == 0) > empty_frac)
-    r <- rowMeans(mat)
     bad_columns <- diag(mat) == 0
+    r <- rowMeans(mat)
+
     if (bad_frac) bad_columns <- bad_columns | r < quantile(r, seq(0, 1, by = bad_frac))[2]
 
     if (plot_hist) hist(r, breaks = 50)
@@ -64,8 +73,8 @@ sparse_cor <- function(x) {
     list(cov = covmat, cor = cormat)
 }
 
-find_params_accurate <- function(pca, number_pca, cores, min_clusters) {
-    doParallel::registerDoParallel(cores = cores)
+find_params_accurate <- function(pca, number_pca, min_clusters) {
+    doParallel::registerDoParallel(cores = parallel::detectCores())
     calinhara_score <- foreach::`%dopar%`(foreach::foreach(i = 1:number_pca), {
         pcs <- as.matrix(pca$x[, 1:i])
         row.names(pcs) <- 1:nrow(pcs)
@@ -92,47 +101,47 @@ find_params_accurate <- function(pca, number_pca, cores, min_clusters) {
     rownames(scores) <- 1:number_pca
     colnames(scores) <- 1:ncol(scores) + 1
 
-    optimal_PCs <- which.max(rowMeans(scores, na.rm = TRUE))
+    optimal_PCs <- as.numeric(names(which.max(rowMeans(scores, na.rm = TRUE))))
     optimal_n_clusters <- which.max(scores[optimal_PCs, ])
-    message(paste('Optimal number of PCs:', optimal_PCs))
+    message(paste('Optimal number of PCs:', optimal_PCs)) # TODO: use names!
     message(paste('Optimal number of clusters:', optimal_n_clusters))
 
     list(n_PCs = optimal_PCs, n_clusters = optimal_n_clusters, scores = scores)
 }
 
-find_params_fast <- function(pca, number_pca, n_samples, min_clusters) {
-    n_pca <- sample(number_pca, n_samples, replace = TRUE)
-    n_clu <- rep(NA, n_samples)
-    calinhara_score <- list()
-
-    for (i in 1:n_samples) {
-        pcs <- as.matrix(pca$x[, 1:n_pca[i]])
-        row.names(pcs) <- 1:nrow(pcs)
-
-        clust <- rioja::chclust(dist(pcs))
-
-        # Broken stick.
-        bs <- rioja::bstick(clust, nrow(pcs) - 1, plot = FALSE)
-        r <- rle(bs$dispersion > bs$bstick)
-        n_cluster <- r$lengths[r$values][1]
-
-        n_clu[i] <- sample(min_clusters:n_cluster, 1)
-        chc <- cutree(clust, k = n_clu[i])
-        calinhara_score[[i]] <- fpc::calinhara(pca$x, chc, cn = n_clu[i])
-    }
-
-    scores <- matrix(NA, nrow = max(n_pca), ncol = max(n_clu))
-    for (i in 1:n_samples) scores[n_pca[i], n_clu[i]] <- calinhara_score[[i]]
-    rownames(scores) <- 1:max(n_pca)
-    colnames(scores) <- 1:max(n_clu)
-
-    optimal_PCs <- which.max(rowMeans(scores, na.rm = TRUE))
-    optimal_n_clusters <- which.max(scores[optimal_PCs, ])
-    message(paste('Optimal number of PCs:', optimal_PCs))
-    message(paste('Optimal number of clusters:', optimal_n_clusters))
-
-    list(n_PCs = optimal_PCs, n_clusters = optimal_n_clusters, scores = scores)
-}
+# find_params_fast <- function(pca, number_pca, n_samples, min_clusters) {
+#     n_pca <- sample(number_pca, n_samples, replace = TRUE)
+#     n_clu <- rep(NA, n_samples)
+#     calinhara_score <- list()
+#
+#     for (i in 1:n_samples) {
+#         pcs <- as.matrix(pca$x[, 1:n_pca[i]])
+#         row.names(pcs) <- 1:nrow(pcs)
+#
+#         clust <- rioja::chclust(dist(pcs))
+#
+#         # Broken stick.
+#         bs <- rioja::bstick(clust, nrow(pcs) - 1, plot = FALSE)
+#         r <- rle(bs$dispersion > bs$bstick)
+#         n_cluster <- r$lengths[r$values][1]
+#
+#         n_clu[i] <- sample(min_clusters:n_cluster, 1)
+#         chc <- cutree(clust, k = n_clu[i])
+#         calinhara_score[[i]] <- fpc::calinhara(pca$x, chc, cn = n_clu[i])
+#     }
+#
+#     scores <- matrix(NA, nrow = max(n_pca), ncol = max(n_clu))
+#     for (i in 1:n_samples) scores[n_pca[i], n_clu[i]] <- calinhara_score[[i]]
+#     rownames(scores) <- 1:max(n_pca)
+#     colnames(scores) <- 1:max(n_clu)
+#
+#     optimal_PCs <- which.max(rowMeans(scores, na.rm = TRUE))
+#     optimal_n_clusters <- which.max(scores[optimal_PCs, ])
+#     message(paste('Optimal number of PCs:', optimal_PCs))
+#     message(paste('Optimal number of clusters:', optimal_n_clusters))
+#
+#     list(n_PCs = optimal_PCs, n_clusters = optimal_n_clusters, scores = scores)
+# }
 
 #' Save Bed file with the TAD's borders coordinates.
 #'
@@ -256,10 +265,7 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200, percent = 0.8) {
 #' Computes a constrained hierarchical clustering of genomic regions in a HiC experiment,
 #' choosing the optimal amount of information from the HiC matrix and selecting the most informative number of TADs.
 #' @param input_data `data.frame` with 3 columns containing HiC data in the format `(bin1, bin2, score)`.
-#' @param cores When `method` is `"accurate"`, the number of cores to use for parallel execution.
 #' @param max_pcs The maximum number of principal components to retain for the analysis.
-#' @param method Which version of the algorithm to use.
-#' @param n_samples When `method` is `"fast"`, the number of samples used to approximate the optimal solution.
 #' @param min_clusters Minimum number of clusters into which partition the chromosome.
 #' @param plot Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
 #' @return `htad` object that defines the clustering of genomic regions.
@@ -268,9 +274,9 @@ plot_var <- function(input_data, max_pcs = NULL, mark = 200, percent = 0.8) {
 #' htads <- call_HTADs(chromosome18_10Mb)
 #' @export
 
-call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurate', 'fast'), n_samples = 60, min_clusters = 1, bad_frac = 0.01, check = TRUE) {
+call_HTADs <- function(input_data, max_pcs = 200, min_clusters = 1, bad_frac = 0.01) {
     # Load and clean data.
-    mat <- load_mat(input_data, bad_frac = bad_frac, check = check)
+    mat <- load_mat(input_data, bad_frac = bad_frac)
     bad_columns <- attr(mat, 'bad_columns')
 
     # Sparse matrix and correlation.
@@ -282,10 +288,11 @@ call_HTADs <- function(input_data, cores = 1, max_pcs = 200, method = c('accurat
     pca <- prcomp(correlation_matrix, rank. = number_pca)
 
     # Find optimal clustering parameters based on Calinhara score.
-    method <- match.arg(method)
-    optimal_params <- switch(method,
-                             accurate = find_params_accurate(pca, number_pca, cores, min_clusters),
-                             fast = find_params_fast(pca, number_pca, n_samples, min_clusters))
+    # method <- match.arg(method)
+    # optimal_params <- switch(method,
+    #                          accurate = find_params_accurate(pca, number_pca, min_clusters),
+    #                          fast = find_params_fast(pca, number_pca, n_samples, min_clusters))
+    optimal_params <- find_params_accurate(pca, number_pca, min_clusters)
 
     # Cluster the PCs subset with the best mean-CHI criterion.
     pcs <- as.matrix(pca$x[, 1:optimal_params$n_PCs])
