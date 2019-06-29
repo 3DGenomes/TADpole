@@ -4,5 +4,5 @@
 .Ruserdata
 .Rproj.user
 .Rbuildignore
-HTADs.Rproj
+*.Rproj
 *.gz
