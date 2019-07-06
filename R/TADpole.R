@@ -123,9 +123,11 @@ find_params <- function(pca, number_pca, min_clusters) {
 plot_dendro <- function(tadpole) {
     dend <- as.dendrogram(tadpole$dendro)
     hpk <- dendextend::heights_per_k.dendrogram(dend)
-    plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper, leaflab = 'none')
+    plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper, 
+         leaflab = 'none',
+         main="Dendrogram of all levels validated by the Broken-Stick model")
     # plot(cut(as.dendrogram(tadpole$dendro, hang = 10), h = tadpole$optimal_n_clusters)$upper, leaflab = 'none')
-    # rect.hclust(tadpole$dendro, k = tadpole$optimal_n_clusters)
+    rect.hclust(tadpole$dendro, k = tadpole$optimal_n_clusters)
     # cutted <- cut(dend, h = hpk[tadpole$optimal_n_clusters], ordered_result = FALSE)$upper
     # labels(cutted) <- 1:tadpole$optimal_n_clusters
 }
