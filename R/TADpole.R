@@ -142,14 +142,12 @@ plot_dendro <- function(tadpole) {
 #' plot_borders(tadpole, input_data = 'data/chromosome18_10Mb.tsv',centromere_search = FALSE)
 #' @export
 
-plot_borders <- function(tadpole, input_data, centromere_search) {
-    mat <- read.big.matrix(input_data,type = "double",sep = "\t")
-    mat <- as.matrix(input_data)
+plot_borders <- function(tadpole, mat_file, centromere_search) {
+    mat <- bigmemory::read.big.matrix(mat_file, type = 'double', sep = '\t')[, ]
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
-    mat = as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
-    colnames(mat) = seq(1:dim(mat)[1])
-    row.names(mat) = seq(1:dim(mat)[1])
-    print(paste("Dimension of the matrix:",dim(mat)))
+    mat <- as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
+    rownames(mat) <- 1:nrow(mat)
+    colnames(mat) <- 1:ncol(mat)
     
     if (centromere_search == FALSE){
     
@@ -163,7 +161,9 @@ plot_borders <- function(tadpole, input_data, centromere_search) {
     
     colors <- colorRampPalette(c('white', 'firebrick3'))
     
-    lattice::levelplot(as.matrix(log(mat)), col.regions = colors, scales = list(draw = FALSE), colorkey = FALSE,
+    lattice::levelplot(as.matrix(log(mat)), 
+                       main=list('TAD Hierarchy',side=1,line=0.5),
+                       col.regions = colors, scales = list(draw = FALSE), colorkey = FALSE,
                        xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
                        panel = function(...) {
                            lattice::panel.levelplot(...)
