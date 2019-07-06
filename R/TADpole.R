@@ -130,6 +130,48 @@ plot_dendro <- function(tadpole) {
     # labels(cutted) <- 1:tadpole$optimal_n_clusters
 }
 
+#' Plot borders
+#'
+#' @param TADpole `TADpole` object returned as by function `TADpole`.
+#' @param mat_file path to the input file. Must be in a tab-delimited matrix format.
+#' @param centromere_search split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
+#' @examples
+#' tadpole <- TADpole('data/chromosome18_10Mb.tsv')
+#' plot_borders(tadpole, input_data = 'data/chromosome18_10Mb.tsv',centromere_search = FALSE)
+#' @export
+
+plot_borders <- function(tadpole, input_data, centromere_search) {
+    mat <- read.big.matrix(input_data,type = "double",sep = "\t")
+    mat <- as.matrix(input_data)
+    mat[is.na(mat)] <- 0 # Clean NA/NaN values.
+    mat = as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
+    colnames(mat) = seq(1:dim(mat)[1])
+    row.names(mat) = seq(1:dim(mat)[1])
+    print(paste("Dimension of the matrix:",dim(mat)))
+    
+    if (centromere_search == FALSE){
+    
+        start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$start
+        end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$end}
+    
+    if (centromere_search == TRUE){
+    
+        start_coord <- tadpole$merging_arms$coord$start
+        end_coord <- tadpole$merging_arms$coord$end}
+    
+    colors <- colorRampPalette(c('white', 'firebrick3'))
+    
+    lattice::levelplot(as.matrix(log(mat)), col.regions = colors, scales = list(draw = FALSE), colorkey = FALSE,
+                       xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
+                       panel = function(...) {
+                           lattice::panel.levelplot(...)
+                           lattice::panel.abline(h = unique(c(start_coord - 0.5, end_coord + 0.5)), lty = 'dotted', col = 'black')
+                           lattice::panel.abline(v = unique(c(start_coord - 0.5, end_coord + 0.5)), lty = 'dotted', col = 'black')
+                       })}
+
+
+
+
 #' Call hierarchical TADs
 #'
 #' Computes a constrained hierarchical clustering of genomic regions in a HiC experiment,
