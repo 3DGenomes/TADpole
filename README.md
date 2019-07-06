@@ -77,7 +77,7 @@ To run the main function `TADpole`, you need to provide an intrachromosomal inte
 ### 2.2) Running the algorithm
 The basic usage is the following:
 ```
-tadpole <- TADpole(input_data = "data/chromosome18_10Mb.tsv", max_pcs = 200, min_clusters = 2, bad_frac = 0.01, centromere_search = FALSE, hist_bad_columns = FALSE)
+tadpole <- TADpole(mat_file = "data/chromosome18_10Mb.tsv", max_pcs = 200, min_clusters = 2, bad_frac = 0.01, centromere_search = FALSE, hist_bad_columns = FALSE)
 ```
 
 #### 2.2.1) Parameters
@@ -134,7 +134,7 @@ start end
 ### 3.1) Plotting the results
 
 #### 3.1.1) Dendrogram plot 
-Dendrogram with all the hierarchical levels validated by the Broken-Stick model.
+Dendrogram with all the hierarchical levels validated by the Broken-Stick model. Optimal clusters are highlighted using red squares. 
 ```
 plot_dendro(tadpole)
 ```
