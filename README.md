@@ -1,13 +1,13 @@
-# HTADs
+# TADpole
 
-The HTADs package applies a constrained hierarchical method to detect Topologically Associated Domains (TADs).
+TADpole package applies a constrained hierarchical method to detect Topologically Associated Domains (TADs).
 
 ## 1) Installation
 
 <!--
 ### 1.1) Using the _devtools_ package
 
-This is the recommended way of installing HTADs.
+This is the recommended way of installing TADpole.
 
 - First, install the devtools package from CRAN, if it is not already installed
 
@@ -18,7 +18,7 @@ install.packages("devtools")
 - Then, Install the HTADs package from GitHub
 
 ```
-devtools::install_github("paulasoler/HTADs")
+devtools::install_github("paulasoler/TADpole")
 ```
 
 ### 1.2) Manual installation from source
@@ -27,7 +27,9 @@ devtools::install_github("paulasoler/HTADs")
 - First, install the required dependencies from within R
 
 ```
-install.packages('DescTools', 'doParallel', 'fpc', 'ggpubr', 'Matrix', 'plotly')
+install.packages('bigmemory', 'Matrix','doParallel', 'dendextend', 'parallel','foreach',
+'fpc', 'rioja')
+
 ```
 
 - Then, get the latest version of the source code from Github
@@ -35,21 +37,21 @@ install.packages('DescTools', 'doParallel', 'fpc', 'ggpubr', 'Matrix', 'plotly')
 by using _wget_:
 
 ```
-wget https://github.com/paulasoler/HTADs/archive/master.zip
-unzip HTADs-master.zip
-mv HTADs-master HTADs
+wget https://github.com/paulasoler/TADpole/archive/master.zip
+unzip TADpole-master.zip
+mv TADpole-master HTADs
 ```
 
 or by cloning the repository:
 
 ```
-git clone https://github.com/paulasoler/HTADs.git
+git clone https://github.com/paulasoler/TADpole.git
 ```
 
 - Finally, install the package
 
 ```
-R CMD INSTALL HTADs
+R CMD INSTALL TADpole
 ```
 
 ## 2) Getting started
@@ -64,49 +66,33 @@ In the `data/` directory, there are 3 regions of chromosome 18 binned at 40kb, o
 - data/chromosome18_6Mb.Rdata
 ```
 
-![Zoom](https://github.com/paulasoler/HTADs/blob/master/misc/zoom_pictures.png)
+![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/zoom_pictures.png)
 
-To obtain this interaction matrices, we processed the HiC data using the [TADbit](https://github.com/3DGenomes/TADbit) Python library, that deals with all the necessary steps to analyse and normalize 3C-based datasets.
+To obtain this interaction matrices, we processed the HiC data using the [TADbit](https://github.com/3DGenomes/TADbit) Python library, that deals with all the necessary steps to analyze and normalize 3C-based data.
 
 In this tutorial, we are going to use **chromosome18_10Mb.tsv**.
 
 ### 2.1) Input data
-To run the main funcion `call_HTADs`, you need to provide a `data.frame` with 3 columns. The first two columns correspond to the pair of bins _(i, j)_ and the third column is their 3C-based interaction score. This score can be the raw or the normalised interaction count. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it effectively corrects for known experimental biases.
+To run the main function `TADpole`, you need to provide an intrachromosomal interaction matrix, representing an entire chromosome or a contiguous chromosome region. Input data are formatted as a tab-delimited matrix format containing the interaction values in each cell. This interaction value can be the raw or normalized interaction count. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it effectively corrects for known experimental biases.
 
-```
-28 27 1108.4257768
-22 12 423.8081569
-26 6  286.1442771
-17 13 1740.2347562
-```
 
 ### 2.2) Running the algorithm
 The basic usage is the following:
 ```
-load('data/chromosome18_10Mb.Rdata')
-htads <- call_HTADs(chromosome18_10Mb, method = 'accurate')
+htads <- TADpole(data/chromosome18_10Mb.tsv, method = 'accurate')
 ```
 
 #### 2.2.1) Parameters
-- **input_data**: `data.frame` with 3 columns containing the 3C-based dataset in the format `(bin1, bin2, score)`.
+- **input_data**: `path` to the input file. Must be in a tab-delimited matrix format.
 - **cores**: Numeric. When `method` is `"accurate"`, the number of cores to use for parallel execution.
 - **max_pcs**: Numeric. The maximum number of principal components to retain for the analysis. Default value of 200 is recommended.
-- **method**: Character. Which version of the algorithm to use. `"accurate"` (default) or `"fast"`.
-
-  -- ***Accurate***
-    - Performs an _exhaustive_ search of all possible solutions.
-    - Has support for multicore parallelization.
-
-  -- ***Fast***
-    - Performs a random search over all possible solutions.
-    - Its precision can be increased at the expense of computation time by increasing the `n_samples` parameter.
-
-- **n_samples**: Numeric. When `method` is `"fast"`, the number of samples used to approximate the optimal solution.
 - **min_clusters**: Minimum number of clusters into which partition the chromosome.
-- **plot**: Logical. Whether to plot the scores of every tested `n_pcs`/`n_clusters` combination.
+- **bad_frac**: fraction of the matrix to flag as bad rows/columns.
+- **hist_bad_columns**: plot the distribution of row/column coverage to help in selecting a useful value for `bad_frac`. Mostly for debugging.
+- **centromere_search**: split the matrix by the centromere into two smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
 
 ## 3) Output
-The funcion `call_HTADs` returns a `htads` object, which is a `list` contaning the following items:
+The function `TADpole` returns a `tadpole` object, which is a `list` containing the following items:
 
 - ***n_pcs***: Optimal number of principal components.
 - ***optimal_n_clusters***: Optimal number of clusters.
@@ -118,7 +104,7 @@ The funcion `call_HTADs` returns a `htads` object, which is a `list` contaning t
 <!-- ![CHindex](https://github.com/paulasoler/HTADs/blob/master/misc/CHindex_accurate_method.png) -->
 
 ```
-head(htads)
+head(tadpole)
 
 $n_pcs
 [1] 41
