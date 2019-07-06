@@ -27,7 +27,7 @@ devtools::install_github("paulasoler/TADpole")
 - First, install the required dependencies from within R
 
 ```
-install.packages('bigmemory', 'Matrix','doParallel', 'dendextend', 'parallel','foreach','fpc', 'rioja')
+install.packages('bigmemory', 'Matrix','doParallel', 'dendextend', 'parallel', 'foreach', 'fpc', 'rioja')
 ```
 
 - Then, get the latest version of the source code from Github
@@ -135,7 +135,9 @@ Dendrogram with all the hierarchical levels validated by the Broken-Stick model.
 ```
 plot_dendro(tadpole)
 ```
-![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/dendogram-1_2.png )
+<p align="center">
+<img src="https://github.com/paulasoler/TADpole/blob/master/misc/dendogram-1_2.png" width="60%">
+</p>
 
 The optimal segmentation can be overlayed on a symmetric HiC matrix to visualize the called TADs
 
@@ -143,8 +145,10 @@ The optimal segmentation can be overlayed on a symmetric HiC matrix to visualize
 plot_borders(tadpole, "data/chromosome18_10Mb.tsv", centromere_search = FALSE)
 ```
 
-![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/TAD_partition.png )
-
+<p align="center">
+<img src="https://github.com/paulasoler/TADpole/blob/master/misc/TAD_partition.png" width="60%" align="center">
+</p>
+  
 ## Authors
 
 - **Paula Soler Vila** - (https://github.com/paulasoler/)
