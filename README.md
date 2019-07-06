@@ -27,9 +27,7 @@ devtools::install_github("paulasoler/TADpole")
 - First, install the required dependencies from within R
 
 ```
-install.packages('bigmemory', 'Matrix','doParallel', 'dendextend', 'parallel','foreach',
-'fpc', 'rioja')
-
+install.packages('bigmemory', 'Matrix','doParallel', 'dendextend', 'parallel','foreach','fpc', 'rioja')
 ```
 
 - Then, get the latest version of the source code from Github
@@ -39,7 +37,7 @@ by using _wget_:
 ```
 wget https://github.com/paulasoler/TADpole/archive/master.zip
 unzip TADpole-master.zip
-mv TADpole-master HTADs
+mv TADpole-master TADpole
 ```
 
 or by cloning the repository:
@@ -61,9 +59,9 @@ In this tutorial, we provide a publicly available HiC data set (SRA: [SRR1658602
 In the `data/` directory, there are 3 regions of chromosome 18 binned at 40kb, one corresponding to the full chromosome, and the others representing regions of 10Mb and 6 Mb:
 
 ```
-- data/chromosome18_74Mb.Rdata
-- data/chromosome18_10Mb.Rdata
-- data/chromosome18_6Mb.Rdata
+- data/chromosome18_74Mb.tsv
+- data/chromosome18_10Mb.tsv
+- data/chromosome18_6Mb.tsv
 ```
 
 ![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/zoom_pictures.png)
@@ -73,18 +71,17 @@ To obtain this interaction matrices, we processed the HiC data using the [TADbit
 In this tutorial, we are going to use **chromosome18_10Mb.tsv**.
 
 ### 2.1) Input data
-To run the main function `TADpole`, you need to provide an intrachromosomal interaction matrix, representing an entire chromosome or a contiguous chromosome region. Input data are formatted as a tab-delimited matrix format containing the interaction values in each cell. This interaction value can be the raw or normalized interaction count. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it effectively corrects for known experimental biases.
+To run the main function `TADpole`, you need to provide an intrachromosomal interaction matrix, representing an entire chromosome or a contiguous chromosome region. Input data are formatted as a tab-delimited matrix format containing the interaction values in each cell. These interaction values can be the raw or normalized interaction counts. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it effectively corrects for known experimental biases.
 
 
 ### 2.2) Running the algorithm
 The basic usage is the following:
 ```
-htads <- TADpole(data/chromosome18_10Mb.tsv, method = 'accurate')
+tadpole <- TADpole(input_data = "data/chromosome18_10Mb.tsv", max_pcs = 200, min_clusters = 2, bad_frac = 0.01, centromere_search = FALSE, hist_bad_columns = FALSE)
 ```
 
 #### 2.2.1) Parameters
 - **input_data**: `path` to the input file. Must be in a tab-delimited matrix format.
-- **cores**: Numeric. When `method` is `"accurate"`, the number of cores to use for parallel execution.
 - **max_pcs**: Numeric. The maximum number of principal components to retain for the analysis. Default value of 200 is recommended.
 - **min_clusters**: Minimum number of clusters into which partition the chromosome.
 - **bad_frac**: fraction of the matrix to flag as bad rows/columns.
@@ -135,10 +132,17 @@ start end
 ```
 
 ### 3.1) Plotting the results
+
+#### 3.1.1) Dendrogram plot 
+Dendrogram with all the hierarchical levels validated by the Broken-Stick model.
+```
+plot_dendro(tadpole)
+```
+
 The optimal segmentation can be overlayed on a symmetric HiC matrix to visualize the called TADs
 
 ```
-plot_borders(matrix_chr18_10Mb, htads)
+plot_borders(tadpole, input_data = "data/chromosome18_10Mb.tsv")
 ```
 
 ![Zoom](https://github.com/paulasoler/HTADs/blob/master/misc/dendogram-1_2.png)
