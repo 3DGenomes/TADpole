@@ -1,6 +1,6 @@
 # TADpole
 
-TADpole, a computational tool designed to identify and analyze the entire hierarchy of topologically associated somains (TADs) in intra-chromosomal interaction matrices.
+TADpole, a computational tool designed to identify and analyze the entire hierarchy of topologically associated domains (TADs) in intra-chromosomal interaction matrices.
 
 ## 1) Installation
 
