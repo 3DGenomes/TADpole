@@ -98,16 +98,14 @@ The function `TADpole` returns a `tadpole` object, which is a `list` containing 
   + ***clusters$`x`$coord***: Start and end coordinades of the TADs.
   + ***clusters$`x`$CH-index***: Calinski-Harabasz index of this segmentation.
 
-<!-- ![CHindex](https://github.com/paulasoler/HTADs/blob/master/misc/CHindex_accurate_method.png) -->
-
 ```
 head(tadpole)
 
 $n_pcs
-[1] 41
+[1] 35
 
 $optimal_n_clusters
-[1] 20
+[1] 16
 
 $dendro
 
@@ -116,19 +114,18 @@ rioja::chclust(d = dist(pcs))
 
 Cluster method   : coniss
 Distance         : euclidean
-Number of objects: 251
+Number of objects: 248
 
 
 $clusters
 $clusters$`2`
 $clusters$`2`$`CH-index`
-[1] 62.7307
+[1] 62,12965
 
 $clusters$`2`$coord
-start end
-1      1  26
-2     27  45
-3     46  72
+  start end
+1     1 110
+2   111 248
 ```
 
 ### 3.1) Plotting the results
@@ -138,6 +135,7 @@ Dendrogram with all the hierarchical levels validated by the Broken-Stick model.
 ```
 plot_dendro(tadpole)
 ```
+![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/dendogram-1_2.png )
 
 The optimal segmentation can be overlayed on a symmetric HiC matrix to visualize the called TADs
 
@@ -145,7 +143,7 @@ The optimal segmentation can be overlayed on a symmetric HiC matrix to visualize
 plot_borders(tadpole, input_data = "data/chromosome18_10Mb.tsv")
 ```
 
-![Zoom](https://github.com/paulasoler/HTADs/blob/master/misc/dendogram-1_2.png)
+![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/dendogram-1_2.png )
 
 ## Authors
 
