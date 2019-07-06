@@ -140,7 +140,7 @@ plot_dendro(tadpole)
 The optimal segmentation can be overlayed on a symmetric HiC matrix to visualize the called TADs
 
 ```
-plot_borders(tadpole, input_data = "data/chromosome18_10Mb.tsv")
+plot_borders(tadpole, "data/chromosome18_10Mb.tsv", centromere_search = FALSE)
 ```
 
 ![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/TAD_partition.png )
