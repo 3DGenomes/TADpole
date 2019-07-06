@@ -143,7 +143,7 @@ The optimal segmentation can be overlayed on a symmetric HiC matrix to visualize
 plot_borders(tadpole, input_data = "data/chromosome18_10Mb.tsv")
 ```
 
-![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/dendogram-1_2.png )
+![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/TAD_partition.png )
 
 ## Authors
 
