@@ -1,6 +1,6 @@
 # TADpole
 
-TADpole package applies a constrained hierarchical method to detect Topologically Associated Domains (TADs).
+TADpole, a computational tool designed to identify and analyze the entire hierarchy of topologically associated somains (TADs) in intra-chromosomal interaction matrices.
 
 ## 1) Installation
 
