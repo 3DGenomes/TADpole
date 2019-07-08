@@ -59,9 +59,9 @@ In this tutorial, we provide a publicly available HiC data set (SRA: [SRR1658602
 In the `data/` directory, there are 3 regions of chromosome 18 binned at 40kb, one corresponding to the full chromosome, and the others representing regions of 10Mb and 6 Mb:
 
 ```
-- data/chromosome18_74Mb.tsv
-- data/chromosome18_10Mb.tsv
-- data/chromosome18_6Mb.tsv
+- inst/extdata/chromosome18_74Mb.tsv
+- inst/extdata/chromosome18_10Mb.tsv
+- inst/extdata/chromosome18_6Mb.tsv
 ```
 
 ![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/zoom_pictures.png)
@@ -150,7 +150,37 @@ plot_borders(tadpole, "data/chromosome18_10Mb.tsv", centromere_search = FALSE)
 <p align="center">
 <img src="https://github.com/paulasoler/TADpole/blob/master/misc/TAD_partition.png" width="60%" align="center">
 </p>
-  
+
+# DiffT Score
+Difference score between topological partitions.
+
+### 1) Input data
+In the `data/` directory, there are 2 partitions from the chromosome 1 obtained in two diferent conditions.
+
+```
+- inst/extdata/control.bed
+- inst/extdata/case.bed
+```
+
+### 2) Running the DiffT score
+
+#### 2.1) Parameters
+- **bed_x/bed_y**: `data.frame` with a three columns BED-like format. The first column represent the chromosome, and the second and the third the start and end TAD's coordinates respectively, in bins.
+
+```
+coords_control <- read.table('inst/extdata/control.bed')
+coords_case <- read.table('inst/extdata/case.bed')
+
+difft_control_case = diffT(coords_control,coords_case)
+```
+### 3) Output
+The function `diffT` returns a `vector`, which is a `list` of DiffT score per bin. With simple plot, we can visualize the acumulative DiffT score profile as a function of the matrix bins. 
+
+<p align="center">
+<img src="https://github.com/paulasoler/TADpole/blob/master/misc/DiffT_score.png" width="60%" align="center">
+</p>
+
+
 ## Authors
 
 - **Paula Soler Vila** - (https://github.com/paulasoler/)
