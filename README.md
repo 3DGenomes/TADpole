@@ -27,7 +27,7 @@ devtools::install_github("paulasoler/TADpole")
 - First, install the required dependencies from within R
 
 ```
-install.packages('bigmemory', 'Matrix','doParallel', 'dendextend', 'parallel', 'foreach', 'fpc', 'rioja')
+install.packages(c('bigmemory', 'dendextend', 'doParallel', 'foreach', 'fpc', 'Matrix', 'rioja'))
 ```
 
 - Then, get the latest version of the source code from Github
