@@ -77,7 +77,8 @@ To run the main function `TADpole`, you need to provide an intrachromosomal inte
 ### 2.2) Running the algorithm
 The basic usage is the following:
 ```
-tadpole <- TADpole(mat_file = "data/chromosome18_10Mb.tsv", max_pcs = 200, min_clusters = 2, bad_frac = 0.01, centromere_search = FALSE, hist_bad_columns = FALSE)
+library(TADpole)
+tadpole <- TADpole("data/chromosome18_10Mb.tsv")
 ```
 
 #### 2.2.1) Parameters
