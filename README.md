@@ -78,7 +78,8 @@ To run the main function `TADpole`, you need to provide an intrachromosomal inte
 The basic usage is the following:
 ```
 library(TADpole)
-tadpole <- TADpole("data/chromosome18_10Mb.tsv")
+chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+tadpole <- TADpole(chromosome18_10Mb)
 ```
 
 #### 2.2.1) Parameters
