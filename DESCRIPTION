@@ -1,24 +1,25 @@
-Package: HTADs
+Package: TADpole
 Type: Package
-Title: Call hierarchical TADs (HTADs)
+Title: Call hierarchical TADs
 Version: 0.0.0.9000
 Authors@R: as.person(c(
     'Paula Soler <paula.soler.vila@gmail.com> [aut]',
     'Pol Cuscó <polcusco@gmail.com> [aut, cre]'))
 Description: HTADs uses constrained hierarchical clustering to call
-    hierarchical Topologically Associated Domains (HTADs) on HiC data.
+    hierarchical Topologically Associated Domains on HiC data.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports:
-    DescTools (>= 0.99.28),
+    bigmemory (>= 4.5.33),
+    dendextend (>= 1.12.0),
     doParallel (>= 1.0.14),
+    foreach (>= 1.4.4),
     fpc (>= 2.1-11.1),
-    ggpubr (>= 0.1.8),
     Matrix (>= 1.2-15),
-    plotly (>= 4.8.0)
+    rioja (>= 0.9-21)
 Depends:
     R (>= 3.5.2)
-URL: https://github.com/paulasoler/HTADs
-BugReports: https://github.com/paulasoler/HTADs/issues
+URL: https://github.com/paulasoler/TADpole
+BugReports: https://github.com/paulasoler/TADpole/issues
 RoxygenNote: 6.1.1

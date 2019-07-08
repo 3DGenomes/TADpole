@@ -1,13 +1,3 @@
-# Imports:
-# bigmemory
-# Matrix
-# doParallel
-# dendextend (for plot)
-# parallel
-# foreach
-# rioja
-# fpc
-
 #' Load a Hi-C matrix from a file
 #'
 #' @param mat_file path to the input file. Must be in a tab-delimited matrix format.
@@ -95,10 +85,6 @@ find_params <- function(pca, number_pca, min_clusters) {
         score
     })
 
-    # scores <- as.matrix(bigmemory::big.matrix(nrow = length(calinhara_score),
-    #                                           ncol = max(sapply(calinhara_score, length)),
-    #                                           type = 'integer',
-    #                                           init = 0))
     scores <- matrix(nrow = length(calinhara_score), ncol = max(sapply(calinhara_score, length)))
     for (pc in 1:length(calinhara_score)) scores[pc, 1:length(calinhara_score[[pc]])] <- calinhara_score[[pc]]
     rownames(scores) <- 1:number_pca
@@ -123,7 +109,7 @@ find_params <- function(pca, number_pca, min_clusters) {
 plot_dendro <- function(tadpole) {
     dend <- as.dendrogram(tadpole$dendro)
     hpk <- dendextend::heights_per_k.dendrogram(dend)
-    plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper, 
+    plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper,
          leaflab = 'none',
          main="Dendrogram of all levels validated by the Broken-Stick model")
     # plot(cut(as.dendrogram(tadpole$dendro, hang = 10), h = tadpole$optimal_n_clusters)$upper, leaflab = 'none')
@@ -148,20 +134,20 @@ plot_borders <- function(tadpole, mat_file, centromere_search) {
     mat <- as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
     rownames(mat) <- 1:nrow(mat)
     colnames(mat) <- 1:ncol(mat)
-    
+
     if (centromere_search == FALSE){
-    
+
         start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$start
         end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$end}
-    
+
     if (centromere_search == TRUE){
-    
+
         start_coord <- tadpole$merging_arms$coord$start
         end_coord <- tadpole$merging_arms$coord$end}
-    
+
     colors <- colorRampPalette(c('white', 'firebrick3'))
-    
-    lattice::levelplot(as.matrix(log(mat)), 
+
+    lattice::levelplot(as.matrix(log(mat)),
                        main=list('TAD Hierarchy',side=1,line=0.5),
                        col.regions = colors, scales = list(draw = FALSE), colorkey = FALSE,
                        xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
@@ -169,10 +155,8 @@ plot_borders <- function(tadpole, mat_file, centromere_search) {
                            lattice::panel.levelplot(...)
                            lattice::panel.abline(h = unique(c(start_coord - 0.5, end_coord + 0.5)), lty = 'dotted', col = 'black')
                            lattice::panel.abline(v = unique(c(start_coord - 0.5, end_coord + 0.5)), lty = 'dotted', col = 'black')
-                       })}
-
-
-
+                       })
+}
 
 #' Call hierarchical TADs
 #'
