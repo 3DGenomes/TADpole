@@ -158,3 +158,5 @@ plot_borders(tadpole, "data/chromosome18_10Mb.tsv", centromere_search = FALSE)
 ## References
 
 1. Rao SSP, Huntley MH, Durand NC, Stamenova EK, Bochkov ID, Robinson JT, Sanborn AL, Machol I, Omer AD, Lander ES, Aiden EL. A Three-dimensional Map of the Human Genome at Kilobase Resolution Reveals Principles of Chromatin Looping. Cell. 2014;159:1665–1680.
+2. Serra, F., Baù, D., Goodstadt, M., Castillo, D. Filion, G., & Marti-Renom, M.A. (2017). Automatic analysis and 3D-modelling of Hi-C data using TADbit reveals structural features of the fly chromatin colors. PLOS Comp Bio 13(7) e1005665. doi:10.1371/journal.pcbi.1005665
+3. Enrique Vidal, François le Dily, Javier Quilez, Ralph Stadhouders, Yasmina Cuartero, Thomas Graf, Marc A Marti-Renom, Miguel Beato, Guillaume J Filion, OneD: increasing reproducibility of Hi-C samples with abnormal karyotypes, Nucleic Acids Research, Volume 46, Issue 8, 4 May 2018, Page e49, https://doi.org/10.1093/nar/gky064
