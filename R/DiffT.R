@@ -18,7 +18,7 @@ random_bed <- function(coords, size, bad_columns) {
 
 #' Compute diffT score between two TAD calls
 #'
-#' @param `bed_x, bed_y` the two calls to compare. Each must be a `data.frame` with a BED-like format.
+#' @param `bed_x, bed_y` the two calls to compare. Each must be a `data.frame` with a BED-like format.The first column represent the chromosome, and the second and the third the start and end TAD's coordinates respectively, in bins
 #' @export
 
 diffT <- function(bed_x, bed_y) {
@@ -52,4 +52,23 @@ diffT <- function(bed_x, bed_y) {
     score_sum <- cumsum(scores)
     if (max(scores) == 0) score_sum
     else score_sum / max(score_sum)
+}
+
+#' Compute a random set of coordinates from a partition done
+#'
+#' @param `bed_x` a `data.frame` with a BED-like format.The first column represent the chromosome, and the second and the third the start and end TAD's coordinates respectively, in bins
+#' @param `bad_columns` a numeric `vector` with the bad columns detected.
+#' @export
+
+bad_columns <- c(344,453)
+
+random_bed <- function(bed_x, bad_columns) {
+    start_x <- bed_x[1, 2]
+    end_x <- bed_x[nrow(bed_x), 3]
+    size = end_x - start_x + 1
+
+    bins <- (start_x:end_x)[-bad_columns]
+    borders <- sort(sample(bins[-1], nrow(bed_x)))
+    V2 = as.numeric(c(start_x, borders[1:length(borders)-1]+1))
+    data.frame(bed_x[, 1],V2,borders)
 }
