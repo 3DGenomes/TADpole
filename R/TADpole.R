@@ -209,7 +209,7 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
             clust <- rioja::chclust(dist(pcs))
 
             tadpole[[arm]]$n_pcs <- optimal_params$n_PCs
-            tadpole[[arm]]$n_optimal <- optimal_params$n_clusters
+            tadpole[[arm]]$optimal_n_clusters <- optimal_params$n_clusters
             tadpole[[arm]]$dendro <- clust
 
             # Saving all the clusters accepted by the broken stick model
@@ -239,7 +239,7 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
                                         'end' = eb)
                 }
 
-                tadpole[[arm]]$cluster[[as.character(k)]] <- list('coord' = coord)
+                tadpole[[arm]]$cluster[[as.character(k)]] <- coord
             }
 
             # Merging optimal clusters in both arms.
@@ -274,7 +274,7 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
         coord <- data.frame('start' = c(1, eb[-length(eb)] + 1, use.names = TRUE),
                             'end' = eb)
         coord <- coord[rle(fixed_clusters_arms[1:(length(fixed_clusters_arms) - length(centromer))])$values != 0, ]
-        tadpole$merging_arms <- list('coord' = coord)
+        tadpole$merging_arms <- coord
 
     } else {
         bad_columns <- attr(mat, 'bad_columns')
@@ -298,8 +298,7 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
         tadpole <- structure(list('n_pcs' = optimal_params$n_PCs,
                                   'optimal_n_clusters' = optimal_params$n_clusters,
                                   'dendro' = clust,
-                                  'clusters' = list(),
-                                  'scores' = optimal_params$scores),
+                                  'clusters' = list()),
                              class = 'tadpole')
 
         for (k in which(!is.na(optimal_params$scores[optimal_params$n_PCs, ]))) {
@@ -328,8 +327,7 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
                                     'end' = eb)
             }
 
-            tadpole$clusters[[as.character(k)]] <- list('CH-index' = optimal_params$scores[optimal_params$n_PCs, k],
-                                                        'coord' = coord)
+            tadpole$clusters[[as.character(k)]] <- coord
         }
     }
 

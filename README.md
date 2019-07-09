@@ -99,8 +99,8 @@ The function `TADpole` returns a `tadpole` object containing the following items
 - ***optimal_n_clusters***: optimal number of clusters.
 - ***dendro***: hierarchical tree-like structure with the TAD divisions.
 - ***clusters***: a list containing the TAD information of all the clusters _(x)_ defined by the broken stick model.
-  + ***clusters$`x`$coord***: start and end coordinades of the TADs.
-  + ***clusters$`x`$CH-index***: Calinski-Harabasz index of this segmentation.
+  + ***clusters$`x`***: start and end coordinades of the TADs.
+- ***merging_arms***: if `centromere_search` is `TRUE`, contains the start and end coordinates of the TADs of the full chromosome.
 
 ```
 head(tadpole)
@@ -123,10 +123,6 @@ Number of objects: 248
 
 $clusters
 $clusters$`2`
-$clusters$`2`$`CH-index`
-[1] 62,12965
-
-$clusters$`2`$coord
   start end
 1     1 110
 2   111 248
@@ -134,7 +130,7 @@ $clusters$`2`$coord
 
 ### 3.1) Plotting the results
 
-#### 3.1.1) Dendrogram plot 
+#### 3.1.1) Dendrogram plot
 Dendrogram with all the hierarchical levels validated by the Broken-Stick model. The optimal clusters are highlighted with red rectangles.
 
 ```
