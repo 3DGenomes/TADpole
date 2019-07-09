@@ -4,7 +4,8 @@ Title: Call hierarchical TADs
 Version: 0.0.0.9000
 Authors@R: as.person(c(
     'Paula Soler <paula.soler.vila@gmail.com> [aut]',
-    'Pol Cuscó <polcusco@gmail.com> [aut, cre]'))
+    'Pol Cuscó <polcusco@gmail.com> [aut, cre]',
+    'Marco Di Stefano <marco.di.distefano.1985@gmail.com> [aut]'))
 Description: HTADs uses constrained hierarchical clustering to call
     hierarchical Topologically Associated Domains on HiC data.
 License: GPL-3

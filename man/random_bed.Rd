@@ -2,7 +2,7 @@
 % Please edit documentation in R/DiffT.R
 \name{random_bed}
 \alias{random_bed}
-\title{Compute a random set of coordinates from a partition done}
+\title{Compute a random set of TAD border coordinates from a sample partition}
 \usage{
 random_bed(bed, bad_columns = NULL)
 }
@@ -12,7 +12,7 @@ random_bed(bed, bad_columns = NULL)
 \item{`bad_columns`}{a numeric `vector` with the positions of the bad columns. TAD borders will not be placed on bad columns. Default value of `NULL` means no bad columns will be introduced.}
 }
 \description{
-Compute a random set of coordinates from a partition done
+Compute a random set of TAD border coordinates from a sample partition
 }
 \examples{
 random_coords <- random_bed(control)

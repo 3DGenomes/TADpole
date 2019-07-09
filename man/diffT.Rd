@@ -7,7 +7,7 @@
 diffT(bed_x, bed_y)
 }
 \arguments{
-\item{`bed_x, }{bed_y` two `data.frame`s with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.}
+\item{`bed_x, bed_y`}{two `data.frame`s with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.}
 }
 \description{
 Compute diffT score between two TAD calls
