@@ -33,5 +33,6 @@ It will do so regardless of whether this stretch represents a true centromere or
 but be cautious of interpreting the partitions as the two chromosomal arms (p and q) when working with smaller regions.
 }
 \examples{
-tadpole <- TADpole('data/chromosome18_10Mb.tsv')
+chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+tadpole <- TADpole(chromosome18_10Mb)
 }

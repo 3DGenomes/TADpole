@@ -13,6 +13,7 @@ plot_dendro(tadpole)
 Plot dendrogram
 }
 \examples{
-tadpole <- TADpole('data/chromosome18_10Mb.tsv')
+chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+tadpole <- TADpole(chromosome18_10Mb)
 plot_dendro(tadpole)
 }

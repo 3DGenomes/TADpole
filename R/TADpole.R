@@ -4,6 +4,9 @@
 #' @param bad_frac fraction of the matrix to falg as bad rows/columns.
 #' @param centromere_search split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
 #' @param hist_bad_columns plot the distribution of row/column coverage to help in selecting a useful value for `bad_frac`. Mostly for debugging.
+#' @examples
+#' chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+#' mat <- load_mat(chromosome18_10Mb)
 #' @export
 
 load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_bad_columns = FALSE) {
@@ -102,7 +105,8 @@ find_params <- function(pca, number_pca, min_clusters) {
 #'
 #' @param TADpole `TADpole` object returned as by function `TADpole`.
 #' @examples
-#' tadpole <- TADpole('data/chromosome18_10Mb.tsv')
+#' chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+#' tadpole <- TADpole(chromosome18_10Mb)
 #' plot_dendro(tadpole)
 #' @export
 
@@ -124,29 +128,27 @@ plot_dendro <- function(tadpole) {
 #' @param mat_file path to the input file. Must be in a tab-delimited matrix format.
 #' @param centromere_search split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
 #' @examples
-#' tadpole <- TADpole('data/chromosome18_10Mb.tsv')
-#' plot_borders(tadpole, input_data = 'data/chromosome18_10Mb.tsv',centromere_search = FALSE)
+#' chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+#' tadpole <- TADpole(chromosome18_10Mb)
+#' plot_borders(tadpole, chromosome18_10Mb)
 #' @export
 
-plot_borders <- function(tadpole, mat_file, centromere_search) {
+plot_borders <- function(tadpole, mat_file, centromere_search = FALSE) {
     mat <- bigmemory::read.big.matrix(mat_file, type = 'double', sep = '\t')[, ]
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
     mat <- as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
     rownames(mat) <- 1:nrow(mat)
     colnames(mat) <- 1:ncol(mat)
 
-    if (centromere_search == FALSE){
-
-        start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$start
-        end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$end}
-
-    if (centromere_search == TRUE){
-
+    if (centromere_search) {
         start_coord <- tadpole$merging_arms$coord$start
-        end_coord <- tadpole$merging_arms$coord$end}
+        end_coord <- tadpole$merging_arms$coord$end
+    } else {
+        start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$start
+        end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$end
+    }
 
     colors <- colorRampPalette(c('white', 'firebrick3'))
-
     lattice::levelplot(as.matrix(log(mat)),
                        main=list('TAD Hierarchy',side=1,line=0.5),
                        col.regions = colors, scales = list(draw = FALSE), colorkey = FALSE,
@@ -173,7 +175,8 @@ plot_borders <- function(tadpole, mat_file, centromere_search) {
 #' It will do so regardless of whether this stretch represents a true centromere or not. Note that this feature is useful when processing an entire chromosome,
 #' but be cautious of interpreting the partitions as the two chromosomal arms (p and q) when working with smaller regions.
 #' @examples
-#' tadpole <- TADpole('data/chromosome18_10Mb.tsv')
+#' chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+#' tadpole <- TADpole(chromosome18_10Mb)
 #' @export
 
 TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, centromere_search = FALSE, hist_bad_columns = FALSE) {

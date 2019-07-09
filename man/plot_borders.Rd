@@ -4,7 +4,7 @@
 \alias{plot_borders}
 \title{Plot borders}
 \usage{
-plot_borders(tadpole, mat_file, centromere_search)
+plot_borders(tadpole, mat_file, centromere_search = FALSE)
 }
 \arguments{
 \item{mat_file}{path to the input file. Must be in a tab-delimited matrix format.}
@@ -17,6 +17,7 @@ plot_borders(tadpole, mat_file, centromere_search)
 Plot borders
 }
 \examples{
-tadpole <- TADpole('data/chromosome18_10Mb.tsv')
-plot_borders(tadpole, input_data = 'data/chromosome18_10Mb.tsv',centromere_search = FALSE)
+chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+tadpole <- TADpole(chromosome18_10Mb)
+plot_borders(tadpole, chromosome18_10Mb)
 }

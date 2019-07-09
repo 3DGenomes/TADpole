@@ -19,3 +19,7 @@ load_mat(mat_file, bad_frac = 0.01, centromere_search = FALSE,
 \description{
 Load a Hi-C matrix from a file
 }
+\examples{
+chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+mat <- load_mat(chromosome18_10Mb)
+}

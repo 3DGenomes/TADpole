@@ -54,9 +54,9 @@ R CMD INSTALL TADpole
 
 ## 2) Getting started
 
-In this tutorial, we provide a publicly available HiC data set (SRA: [SRR1658602](https://www.ebi.ac.uk/ena/data/view/SRR1658602)).
+In this repository, we provide a publicly available HiC data set (SRA: [SRR1658602](https://www.ebi.ac.uk/ena/data/view/SRR1658602)).
 
-In the `data/` directory, there are 3 regions of chromosome 18 binned at 40kb, one corresponding to the full chromosome, and the others representing regions of 10Mb and 6 Mb:
+In the `inst/extdata/` directory, there are 3 regions of chromosome 18 binned at 40kb, one corresponding to the full chromosome, and the others representing regions of 10 and 6 Mb:
 
 ```
 - inst/extdata/chromosome18_74Mb.tsv
@@ -66,32 +66,34 @@ In the `data/` directory, there are 3 regions of chromosome 18 binned at 40kb, o
 
 ![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/zoom_pictures.png)
 
-To obtain this interaction matrices, we processed the HiC data using the [TADbit](https://github.com/3DGenomes/TADbit) Python library, that deals with all the necessary steps to analyze and normalize 3C-based data.
+To obtain these interaction matrices, we processed the HiC data using the [TADbit](https://github.com/3DGenomes/TADbit) Python library, that deals with all the necessary steps to analyze and normalize 3C-based data.
 
 In this tutorial, we are going to use **chromosome18_10Mb.tsv**.
 
 ### 2.1) Input data
-To run the main function `TADpole`, you need to provide an intrachromosomal interaction matrix, representing an entire chromosome or a contiguous chromosome region. Input data are formatted as a tab-delimited matrix format containing the interaction values in each cell. These interaction values can be the raw or normalized interaction counts. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it effectively corrects for known experimental biases.
+To run the main function `TADpole`, you need to provide an intrachromosomal interaction matrix, representing an entire chromosome or a contiguous chromosome region. Input data are provided in a tab-delimited matrix format containing the interaction values in each cell. These interaction values can be the raw or normalized interaction counts. We highly recommend [ONED](https://github.com/qenvio/dryhic) normalization, as it effectively corrects for known experimental biases.
 
 
 ### 2.2) Running the algorithm
 The basic usage is the following:
+
 ```
 library(TADpole)
 chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
+
 tadpole <- TADpole(chromosome18_10Mb)
 ```
 
 #### 2.2.1) Parameters
 - **input_data**: `path` to the input file. Must be in a tab-delimited matrix format.
-- **max_pcs**: Numeric. The maximum number of principal components to retain for the analysis. Default value of 200 is recommended.
-- **min_clusters**: Minimum number of clusters into which partition the chromosome.
+- **max_pcs**: the maximum number of principal components to retain for the analysis. Default value of 200 is recommended.
+- **min_clusters**: minimum number of clusters into which partition the chromosome.
 - **bad_frac**: fraction of the matrix to flag as bad rows/columns.
-- **hist_bad_columns**: plot the distribution of row/column coverage to help in selecting a useful value for `bad_frac`. Mostly for debugging.
+- **hist_bad_columns**: plot the distribution of row/column coverage to help in selecting a useful value for `bad_frac`. Mostly for debugging purposes.
 - **centromere_search**: split the matrix by the centromere into two smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.
 
 ## 3) Output
-The function `TADpole` returns a `tadpole` object, which is a `list` containing the following items:
+The function `TADpole` returns a `tadpole` object containing the following items:
 
 - ***n_pcs***: Optimal number of principal components.
 - ***optimal_n_clusters***: Optimal number of clusters.
@@ -133,10 +135,12 @@ $clusters$`2`$coord
 ### 3.1) Plotting the results
 
 #### 3.1.1) Dendrogram plot 
-Dendrogram with all the hierarchical levels validated by the Broken-Stick model. Optimal clusters are highlighted using red squares. 
+Dendrogram with all the hierarchical levels validated by the Broken-Stick model. Optimal clusters are highlighted with red rectangles. 
+
 ```
 plot_dendro(tadpole)
 ```
+
 <p align="center">
 <img src="https://github.com/paulasoler/TADpole/blob/master/misc/dendogram-1_2.png" width="60%">
 </p>
@@ -144,7 +148,7 @@ plot_dendro(tadpole)
 The optimal segmentation can be overlayed on a symmetric HiC matrix to visualize the called TADs
 
 ```
-plot_borders(tadpole, "data/chromosome18_10Mb.tsv", centromere_search = FALSE)
+plot_borders(tadpole, chromosome18_10Mb)
 ```
 
 <p align="center">
@@ -155,31 +159,30 @@ plot_borders(tadpole, "data/chromosome18_10Mb.tsv", centromere_search = FALSE)
 Difference score between topological partitions.
 
 ### 1) Input data
-In the `data/` directory, there are 2 partitions from the chromosome 1 obtained in two diferent conditions.
+In the `data/` directory, there are 2 partitions from chromosome 1 obtained in two diferent conditions. Each of them
+is a BED-like `data.frame`.
 
 ```
-- inst/extdata/control.bed
-- inst/extdata/case.bed
+- data/control.Rdata
+- data/case.Rdata
 ```
 
-### 2) Running the DiffT score
+### 2) Computing the DiffT score
+
+```
+difft_control_case <- diffT(control, case)
+```
 
 #### 2.1) Parameters
-- **bed_x/bed_y**: `data.frame` with a three columns BED-like format. The first column represent the chromosome, and the second and the third the start and end TAD's coordinates respectively, in bins.
+- **bed_x**, **bed_y**: two `data.frame`s with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.
 
-```
-coords_control <- read.table('inst/extdata/control.bed')
-coords_case <- read.table('inst/extdata/case.bed')
-
-difft_control_case = diffT(coords_control,coords_case)
-```
 ### 3) Output
-The function `diffT` returns a `vector`, which is a `list` of DiffT score per bin. With simple plot, we can visualize the acumulative DiffT score profile as a function of the matrix bins. 
+The function `diffT` returns a `numeric` vector representing the cumulative the DiffT score along the bins.
+The highest local differences between the two matrices can be identified by the sharpest changes in the slope of the function.
 
 <p align="center">
 <img src="https://github.com/paulasoler/TADpole/blob/master/misc/DiffT_score.png" width="60%" align="center">
 </p>
-
 
 ## Authors
 

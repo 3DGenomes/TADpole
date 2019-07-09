@@ -1,26 +1,15 @@
-#' Chromosome 18 (74 Mb).
+#' TAD partition of chromosome 1 (control).
 #'
-#' Contains HiC data of a 74 Mb portion of the chromosome 18
-#' in the human cell line GM12878, at a resolution of 40 kb.
+#' Contains the start and end coordinates (in bins) of the
+#' set of 10 TADs called in a control region of chromosome 1.
 #'
-#' @format A 2006x2006 tab-delimited numeric matrix.
-#' @source Rao et al. \url{https://www.ebi.ac.uk/ena/data/view/SRR1658602}
-'chromosome18_74Mb.tsv'
+#' @format A `data.frame` with 3 columns representing the chromosome, start and end coordinates of each TAD, respectively.
+'control'
 
-#' Chromosome 18 (10 Mb).
+#' TAD partition of chromosome 1 (case).
 #'
-#' Contains HiC data of a 10 Mb portion of the chromosome 18
-#' in the human cell line GM12878, at a resolution of 40 kb.
+#' Contains the start and end coordinates (in bins) of the
+#' set of 10 TADs called in a case region of chromosome 1.
 #'
-#' @format A 251x251 tab-delimited numeric matrix.
-#' @source Rao et al. \url{https://www.ebi.ac.uk/ena/data/view/SRR1658602}
-'chromosome18_10Mb.tsv'
-
-#' Chromosome 18 (6 Mb).
-#'
-#' Contains HiC data of a 6 Mb portion of the chromosome 18
-#' in the human cell line GM12878, at a resolution of 40 kb.
-#'
-#' @format A 151x151 tab-delimited numeric matrix.
-#' @source Rao et al. \url{https://www.ebi.ac.uk/ena/data/view/SRR1658602}
-'chromosome18_6Mb.tsv'
+#' @format A `data.frame` with 3 columns representing the chromosome, start and end coordinates of each TAD, respectively.
+'case'

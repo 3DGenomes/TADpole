@@ -8,17 +8,10 @@ bin_index <- function(bed, size) {
     tad_index
 }
 
-random_bed <- function(coords, size, bad_columns) {
-    bins <- (1:size)[-bad_columns]
-    borders <- sort(sample(bins[-1], nrow(coords) - 1))
-    data.frame(coords[, 1],
-               c(1, borders - 1),
-               c(borders - 2, size))
-}
-
 #' Compute diffT score between two TAD calls
-#'
-#' @param `bed_x, bed_y` the two calls to compare. Each must be a `data.frame` with a BED-like format.The first column represent the chromosome, and the second and the third the start and end TAD's coordinates respectively, in bins
+#' @param `bed_x, bed_y` two `data.frame`s with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.
+#' @examples
+#' difft_control_case <- diffT(control, case)
 #' @export
 
 diffT <- function(bed_x, bed_y) {
@@ -41,7 +34,7 @@ diffT <- function(bed_x, bed_y) {
                rep(max(tad_y), max(0, end_x - end_y)))
     # As a result, the indices of both calls should have the same length.
     stopifnot(length(tad_x) == length(tad_y))
-    
+
     # Bad columns are counted as not matching.
     scores <- c()
     for(bin in 1:length(tad_x)) {
@@ -56,19 +49,22 @@ diffT <- function(bed_x, bed_y) {
 
 #' Compute a random set of coordinates from a partition done
 #'
-#' @param `bed_x` a `data.frame` with a BED-like format.The first column represent the chromosome, and the second and the third the start and end TAD's coordinates respectively, in bins
-#' @param `bad_columns` a numeric `vector` with the bad columns detected.
+#' @param `bed` a `data.frame` with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.
+#' @param `bad_columns` a numeric `vector` with the positions of the bad columns. TAD borders will not be placed on bad columns. Default value of `NULL` means no bad columns will be introduced.
+#' @examples
+#' random_coords <- random_bed(control)
 #' @export
 
-bad_columns <- c(344,453)
+random_bed <- function(bed, bad_columns = NULL) {
+    start <- bed[1, 2]
+    end <- bed[nrow(bed), 3]
+    size <- end - start + 1
 
-random_bed <- function(bed_x, bad_columns) {
-    start_x <- bed_x[1, 2]
-    end_x <- bed_x[nrow(bed_x), 3]
-    size = end_x - start_x + 1
+    if (is.null(bad_columns)) bins <- start:end
+    else bins <- (start:end)[-bad_columns]
 
-    bins <- (start_x:end_x)[-bad_columns]
-    borders <- sort(sample(bins[-1], nrow(bed_x)))
-    V2 = as.numeric(c(start_x, borders[1:length(borders)-1]+1))
-    data.frame(bed_x[, 1],V2,borders)
+    borders <- sort(sample(bins[-1], nrow(bed) - 1))
+    data.frame(chrom = bed[, 1],
+               start = c(start, borders - 1),
+               end = c(borders - 2, start + size - 1))
 }
