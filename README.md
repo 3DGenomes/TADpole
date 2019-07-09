@@ -170,8 +170,8 @@ is a BED-like `data.frame`.
 ### 2) Computing the DiffT score
 
 ```
-control <- system.file("extdata", "control.bed", package = "TADpole")
-case <- system.file("extdata", "case.bed", package = "TADpole")
+control <- read.table(system.file("extdata", "control.bed", package = "TADpole"))
+case <- read.table(system.file("extdata", "case.bed", package = "TADpole"))
 
 difft_control_case <- diffT(control, case)
 ```
