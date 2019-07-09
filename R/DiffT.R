@@ -9,7 +9,7 @@ bin_index <- function(bed, size) {
 }
 
 #' Compute diffT score between two TAD calls
-#' @param `bed_x, bed_y` two `data.frame`s with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.
+#' @param `bed_x,bed_y` two `data.frame`s with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.
 #' @examples
 #' difft_control_case <- diffT(control, case)
 #' @export
@@ -47,7 +47,7 @@ diffT <- function(bed_x, bed_y) {
     else score_sum / max(score_sum)
 }
 
-#' Compute a random set of coordinates from a partition done
+#' Compute a random set of TAD border coordinates from a sample partition
 #'
 #' @param `bed` a `data.frame` with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.
 #' @param `bad_columns` a numeric `vector` with the positions of the bad columns. TAD borders will not be placed on bad columns. Default value of `NULL` means no bad columns will be introduced.
