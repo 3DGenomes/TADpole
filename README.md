@@ -188,6 +188,7 @@ The highest local differences between the two matrices can be identified by the 
 
 - **Paula Soler Vila** - (https://github.com/paulasoler/)
 - **Pol Cuscó Pons** - (https://github.com/nanakiksc/)
+- **Marco Di Stefano** - (https://github.com/MarcoDiS)
 
 ## References
 
