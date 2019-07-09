@@ -141,11 +141,11 @@ plot_borders <- function(tadpole, mat_file, centromere_search = FALSE) {
     colnames(mat) <- 1:ncol(mat)
 
     if (centromere_search) {
-        start_coord <- tadpole$merging_arms$coord$start
-        end_coord <- tadpole$merging_arms$coord$end
+        start_coord <- tadpole$merging_arms$start
+        end_coord <- tadpole$merging_arms$end
     } else {
-        start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$start
-        end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$coord$end
+        start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$start
+        end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$end
     }
 
     colors <- colorRampPalette(c('white', 'firebrick3'))
