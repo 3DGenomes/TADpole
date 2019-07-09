@@ -11,6 +11,8 @@ bin_index <- function(bed, size) {
 #' Compute diffT score between two TAD calls
 #' @param `bed_x,bed_y` two `data.frame`s with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.
 #' @examples
+#' control <- system.file("extdata", "control.bed", package = "TADpole")
+#' case <- system.file("extdata", "case.bed", package = "TADpole")
 #' difft_control_case <- diffT(control, case)
 #' @export
 
@@ -52,6 +54,7 @@ diffT <- function(bed_x, bed_y) {
 #' @param `bed` a `data.frame` with a BED-like format with 3 columns: chromosome, start and end coordinates of each TAD, in bins.
 #' @param `bad_columns` a numeric `vector` with the positions of the bad columns. TAD borders will not be placed on bad columns. Default value of `NULL` means no bad columns will be introduced.
 #' @examples
+#' control <- system.file("extdata", "control.bed", package = "TADpole")
 #' random_coords <- random_bed(control)
 #' @export
 

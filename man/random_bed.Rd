@@ -15,5 +15,6 @@ random_bed(bed, bad_columns = NULL)
 Compute a random set of TAD border coordinates from a sample partition
 }
 \examples{
+control <- system.file("extdata", "control.bed", package = "TADpole")
 random_coords <- random_bed(control)
 }
