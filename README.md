@@ -3,7 +3,8 @@
 TADpole is a computational tool designed to identify and analyze the entire hierarchy of topologically associated domains (TADs) in intra-chromosomal interaction matrices.
 
 ## Authors
-TADpole is currently developed at the  `MarciusLab <http://www.marciuslab.org>`_ with the contributions of Paula Soler (https://github.com/paulasoler/), Pol Cuscó (https://github.com/nanakiksc/), Marco Di Stefano (https://github.com/MarcoDiS), Irene Farabella, and many other members of our Lab- 
+TADpole is currently developed at the [MarciusLab](http://www.marciuslab.org) with the contributions of [Paula Soler](https://github.com/paulasoler/), [Pol Cuscó](https://github.com/nanakiksc/), [Marco Di Stefano](https://github.com/MarcoDis/), Irene Farabella, and many other members of our Lab.
+
 
 ## 1) Installation
 
@@ -69,6 +70,7 @@ In the `inst/extdata/` directory, there are 3 regions of chromosome 18 binned at
 ```
 
 ![Zoom](https://github.com/3DGenomes/TADpole/tree/master/misc/zoom_pictures.png)
+
 
 To obtain these interaction matrices, we processed the Hi-C data using the [TADbit](https://github.com/3DGenomes/TADbit) (2) Python library, that deals with all the necessary steps to analyze and normalize Hi-C data.
 
@@ -145,7 +147,7 @@ plot_dendro(tadpole)
 - **centromere_search**: `logical` split the matrix by the centromere into two smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) matrices.
 
 <p align="center">
-<img src="https://github.com/3DGenomes/TADpole/tree/master/misc/dendogram-1_2.png" width="60%">
+<img src="https://github.com/3DGenomes/TADpole/tree/master/misc/dendogram-1_2.png" width="30%">
 </p>
 
 
