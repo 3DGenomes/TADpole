@@ -46,7 +46,8 @@ or by cloning the repository:
 git clone https://github.com/paulasoler/TADpole.git
 ```
 
-- Finally, install the TADpole package
+- Finally, install the TADpole package. The package 'TADpole' requires R >= 3.5.2
+
 
 ```
 R CMD INSTALL TADpole
