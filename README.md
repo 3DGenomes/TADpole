@@ -87,11 +87,11 @@ tadpole <- TADpole(chromosome18_10Mb)
 
 #### 2.2.1) Parameters
 - **input_data**: `path` to the input file. Must be in a tab-delimited matrix format.
-- **max_pcs**: the maximum number of principal components to retain for the analysis. Default value of 200 is recommended.
-- **min_clusters**: minimum number of clusters to partition the chromatin region.
-- **bad_frac**: fraction of the matrix to flag as bad columns.
-- **hist_bad_columns**: plot the distribution of column coverage to help in selecting a useful value for `bad_frac`. Mostly for debugging purposes.
-- **centromere_search**: split the matrix by the centromere into two smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) matrices.
+- **max_pcs**: `numeric` the maximum number of principal components to retain for the analysis. Default value of 200 is recommended.
+- **min_clusters**: `numeric` minimum number of clusters to partition the chromatin region.
+- **bad_frac**: `numeric` fraction of the matrix to flag as bad columns.
+- **hist_bad_columns**: `logical` plot the distribution of column coverage to help in selecting a useful value for `bad_frac`. Mostly for debugging purposes.
+- **centromere_search**: `logical` split the matrix by the centromere into two smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) matrices.
 
 ## 3) Output
 The function `TADpole` returns a `tadpole` object containing the following items:
@@ -137,16 +137,24 @@ Dendrogram with all the hierarchical levels validated by the Broken-Stick model.
 ```
 plot_dendro(tadpole)
 ```
+##### 3.1.1.1) Parameters
+- **tadpole**: `tadpole` object
+- **centromere_search**: `logical` split the matrix by the centromere into two smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) matrices.
 
 <p align="center">
 <img src="https://github.com/paulasoler/TADpole/blob/master/misc/dendogram-1_2.png" width="60%">
 </p>
 
-The optimal segmentation can be overlayed on the input Hi-C matrix to visualize the called TADs
+#### 3.1.2) Optimal segmentation overlayed on the Hi-C matrix
 
 ```
 plot_borders(tadpole, chromosome18_10Mb)
 ```
+##### 3.1.2.1) Parameters
+- **tadpole**: `tadpole` object
+- **input_data**: `path` to the input file. Must be in a tab-delimited matrix format.
+- **centromere_search**: `logical` split the matrix by the centromere into two smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) matrices.
+
 
 <p align="center">
 <img src="https://github.com/paulasoler/TADpole/blob/master/misc/TAD_partition.png" width="60%" align="center">
