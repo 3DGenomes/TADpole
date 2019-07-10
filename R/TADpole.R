@@ -125,7 +125,7 @@ plot_dendro <- function(tadpole, centromere_search = FALSE)
         rect.hclust(tadpole$p$dendro, k = tadpole$p$optimal_n_clusters)
         
         plot(cut(dend_q, h = hpk_q[tadpole$q$optimal_n_clusters])$upper,
-         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the p arm")
+         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the q arm")
         rect.hclust(tadpole$q$dendro, k = tadpole$q$optimal_n_clusters)}
     
     else {
