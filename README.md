@@ -2,6 +2,15 @@
 
 TADpole is a computational tool designed to identify and analyze the entire hierarchy of topologically associated domains (TADs) in intra-chromosomal interaction matrices.
 
+
+
+## Authors
+TADpole is currently developed at the 
+- **Paula Soler Vila** - (https://github.com/paulasoler/)
+- **Pol Cuscó Pons** - (https://github.com/nanakiksc/)
+- **Marco Di Stefano** - (https://github.com/MarcoDiS)
+
+
 ## 1) Installation
 
 <!--
@@ -35,7 +44,7 @@ install.packages(c('bigmemory', 'dendextend', 'doParallel', 'foreach', 'fpc', 'M
 by using _wget_:
 
 ```
-wget https://github.com/paulasoler/TADpole/archive/master.zip
+wget https://github.com/3DGenomes/TADpole/archive/master.zip
 unzip TADpole-master.zip
 mv TADpole-master TADpole
 ```
@@ -43,7 +52,7 @@ mv TADpole-master TADpole
 or by cloning the repository:
 
 ```
-git clone https://github.com/paulasoler/TADpole.git
+git clone https://github.com/3DGenomes/TADpole.git
 ```
 
 - Finally, install the TADpole package. The package 'TADpole' requires R >= 3.5.2
@@ -65,7 +74,7 @@ In the `inst/extdata/` directory, there are 3 regions of chromosome 18 binned at
 - inst/extdata/chromosome18_6Mb.tsv
 ```
 
-![Zoom](https://github.com/paulasoler/TADpole/blob/master/misc/zoom_pictures.png)
+![Zoom](https://github.com/3DGenomes/TADpole/tree/master/misc/zoom_pictures.png)
 
 To obtain these interaction matrices, we processed the Hi-C data using the [TADbit](https://github.com/3DGenomes/TADbit) (2) Python library, that deals with all the necessary steps to analyze and normalize Hi-C data.
 
@@ -142,8 +151,10 @@ plot_dendro(tadpole)
 - **centromere_search**: `logical` split the matrix by the centromere into two smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) matrices.
 
 <p align="center">
-<img src="https://github.com/paulasoler/TADpole/blob/master/misc/dendogram-1_2.png" width="60%">
+<img src="https://github.com/3DGenomes/TADpole/tree/master/misc/dendogram-1_2.png" width="60%">
 </p>
+
+
 
 #### 3.1.2) Optimal segmentation overlayed on the Hi-C matrix
 
@@ -157,7 +168,7 @@ plot_borders(tadpole, chromosome18_10Mb)
 
 
 <p align="center">
-<img src="https://github.com/paulasoler/TADpole/blob/master/misc/TAD_partition.png" width="60%" align="center">
+<img src="https://github.com/3DGenomes/TADpole/tree/master/misc/TAD_partition.png" width="60%" align="center">
 </p>
 
 # DiffT Score
@@ -190,14 +201,9 @@ The highest local differences between the two matrices can be identified by the 
 plot(difft_control_case, type="l")
 ```
 <p align="center">
-<img src="https://github.com/paulasoler/TADpole/blob/master/misc/DiffT_score.png" width="60%" align="center">
+<img src="https://github.com/3DGenomes/TADpole/tree/master/misc/DiffT_score.png" width="60%" align="center">
 </p>
 
-## Authors
-
-- **Paula Soler Vila** - (https://github.com/paulasoler/)
-- **Pol Cuscó Pons** - (https://github.com/nanakiksc/)
-- **Marco Di Stefano** - (https://github.com/MarcoDiS)
 
 ## References
 
