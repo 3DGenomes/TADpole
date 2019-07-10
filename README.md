@@ -68,7 +68,7 @@ In the `inst/extdata/` directory, there are 3 regions of chromosome 18 binned at
 - inst/extdata/chromosome18_6Mb.tsv
 ```
 
-![Zoom](https://github.com/3DGenomes/TADpole/tree/master/misc/zoom_pictures.png)
+![Zoom](misc/zoom_pictures.png)
 
 
 To obtain these interaction matrices, we processed the Hi-C data using the [TADbit](https://github.com/3DGenomes/TADbit) (2) Python library, that deals with all the necessary steps to analyze and normalize Hi-C data.
@@ -146,7 +146,7 @@ plot_dendro(tadpole)
 - **centromere_search**: `logical` split the matrix by the centromere into two smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) matrices.
 
 <p align="center">
-<img src="https://github.com/3DGenomes/TADpole/tree/master/misc/dendogram-1_2.png" width="30%">
+<img src="misc/dendogram-1_2.png" width="60%" align="center">
 </p>
 
 
@@ -163,7 +163,7 @@ plot_borders(tadpole, chromosome18_10Mb)
 
 
 <p align="center">
-<img src="https://github.com/3DGenomes/TADpole/tree/master/misc/TAD_partition.png" width="60%" align="center">
+<img src="misc/TAD_partition.png" width="60%" align="center">
 </p>
 
 # DiffT Score
@@ -196,7 +196,7 @@ The highest local differences between the two matrices can be identified by the 
 plot(difft_control_case, type="l")
 ```
 <p align="center">
-<img src="https://github.com/3DGenomes/TADpole/tree/master/misc/DiffT_score.png" width="60%" align="center">
+<img src="misc/DiffT_score.png" width="60%" align="center">
 </p>
 
 ## Citation
