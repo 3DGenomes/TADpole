@@ -3,8 +3,7 @@
 TADpole is a computational tool designed to identify and analyze the entire hierarchy of topologically associated domains (TADs) in intra-chromosomal interaction matrices.
 
 ## Authors
-TADpole is currently developed at the [MarciusLab](http://www.marciuslab.org) with the contributions of [Paula Soler](https://github.com/paulasoler/), [Pol Cuscó](https://github.com/nanakiksc/), [Marco Di Stefano](https://github.com/MarcoDis/), Irene Farabella, and many other members of our Lab.
-
+TADpole is currently developed at the [MarciusLab](http://www.marciuslab.org) with the contributions of [Paula Soler](https://github.com/paulasoler/), [Pol Cuscó](https://github.com/nanakiksc/), [Marco Di Stefano](https://github.com/MarcoDis/), [Irene Farabella](https://github.com/iosonoirene/), and many other members of our Lab.
 
 ## 1) Installation
 
