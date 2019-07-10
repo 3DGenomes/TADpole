@@ -167,8 +167,8 @@ Difference score between topological partitions.
 In the `data/` directory, there are 2 partitions from mouse chromosome 1 obtained in two different conditions (4). Each of them is a BED-like `data.frame`.
 
 ```
-- data/control.Rdata
-- data/case.Rdata
+- data/control.bed
+- data/case.bed
 ```
 
 ### 2) Computing the DiffT score
