@@ -110,16 +110,34 @@ find_params <- function(pca, number_pca, min_clusters) {
 #' plot_dendro(tadpole)
 #' @export
 
-plot_dendro <- function(tadpole) {
-    dend <- as.dendrogram(tadpole$dendro)
-    hpk <- dendextend::heights_per_k.dendrogram(dend)
-    plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper,
+plot_dendro <- function(tadpole, centromere_search = FALSE) 
+{
+    if (centromere_search) {
+       dend_p <- as.dendrogram(tadpole$p$dendro)
+        hpk_p <- dendextend::heights_per_k.dendrogram(dend_p)
+        
+        dend_q <- as.dendrogram(tadpole$q$dendro)
+        hpk_q <- dendextend::heights_per_k.dendrogram(dend_q)
+   
+        par(mfrow=c(2,1))
+        plot(cut(dend_p, h = hpk_p[tadpole$p$optimal_n_clusters])$upper,
+         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the p arm")
+        rect.hclust(tadpole$p$dendro, k = tadpole$p$optimal_n_clusters)
+        
+        plot(cut(dend_q, h = hpk_q[tadpole$q$optimal_n_clusters])$upper,
+         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the p arm")
+        rect.hclust(tadpole$q$dendro, k = tadpole$q$optimal_n_clusters)}
+    
+    else {
+      dend <- as.dendrogram(tadpole$dendro)
+      hpk <- dendextend::heights_per_k.dendrogram(dend)
+      plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper,
          leaflab = 'none',
          main="Dendrogram of all levels validated by the Broken-Stick model")
     # plot(cut(as.dendrogram(tadpole$dendro, hang = 10), h = tadpole$optimal_n_clusters)$upper, leaflab = 'none')
-    rect.hclust(tadpole$dendro, k = tadpole$optimal_n_clusters)
-    # cutted <- cut(dend, h = hpk[tadpole$optimal_n_clusters], ordered_result = FALSE)$upper
-    # labels(cutted) <- 1:tadpole$optimal_n_clusters
+    rect.hclust(tadpole$dendro, k = tadpole$optimal_n_clusters)}
+        
+
 }
 
 #' Plot borders
