@@ -52,9 +52,12 @@ load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_
         attr(mat_p, 'bad_columns') <- bad_colums_p
         attr(mat_q, 'bad_columns') <- bad_colums_q
 
-        return(list(p = mat_p, q = mat_q, centromere = centromere_start:centromere_end))
+        return(list(p = mat_p, q = mat_q, 
+                    centromere = centromere_start:centromere_end,
+                    attr(mat_p, 'bad_columns'),
+                    attr(mat_q, 'bad_columns')))
 
-    } else return(mat[!bad_columns, !bad_columns])
+    } else return(list(mat = mat[!bad_columns, !bad_columns],(which(bad_columns))))
 }
 
 sparse_cor <- function(x) {
@@ -125,7 +128,7 @@ plot_dendro <- function(tadpole, centromere_search = FALSE)
         rect.hclust(tadpole$p$dendro, k = tadpole$p$optimal_n_clusters)
         
         plot(cut(dend_q, h = hpk_q[tadpole$q$optimal_n_clusters])$upper,
-         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the p arm")
+         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the q arm")
         rect.hclust(tadpole$q$dendro, k = tadpole$q$optimal_n_clusters)}
     
     else {
@@ -199,9 +202,12 @@ plot_borders <- function(tadpole, mat_file, centromere_search = FALSE) {
 
 TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, centromere_search = FALSE, hist_bad_columns = FALSE) {
     # Load and clean data.
-    mat <- load_mat(mat_file, bad_frac = bad_frac, centromere_search = centromere_search, hist_bad_columns = hist_bad_columns)
+    mat_bc <- load_mat(mat_file, bad_frac = bad_frac, 
+                       centromere_search = centromere_search, 
+                       hist_bad_columns = hist_bad_columns)
 
     if (centromere_search) {
+        mat <- mat_bc
         fixed_clusters_arms <- c()
         names_clusters_arms <- c()
         tadpole <- structure(list(), class = 'tadpole')
@@ -295,7 +301,8 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
         tadpole$merging_arms <- coord
 
     } else {
-        bad_columns <- attr(mat, 'bad_columns')
+        mat = mat_bc[[1]]
+        bad_columns = mat_bc[[2]]
 
         # Sparse matrix and correlation.
         correlation_matrix <- sparse_cor(mat)$cor
