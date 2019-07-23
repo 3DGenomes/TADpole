@@ -24,7 +24,6 @@ load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_
 
     if (hist_bad_columns) hist(r, breaks = 50)
 
-    attr(mat, 'bad_columns') <- names(which(bad_columns))
     message(paste(sum(bad_columns), 'bad columns found at position(s):'))
     message(paste(attr(mat, 'bad_columns'), collapse = ' '))
 
@@ -37,7 +36,9 @@ load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_
         message(paste('centromere position:', centromere_start, centromere_end))
         if (centromere_start == 1 || centromere_end == nrow(mat)) {
             message('longest stretch of bad rows/columns at the ends, not splitting the matrix.')
-            return(mat[!bad_columns, !bad_columns])
+            mat <- mat[!bad_columns, !bad_columns]
+            attr(mat, 'bad_columns') <- names(which(bad_columns))
+            return(mat)
         }
 
         idx_p <- 1:(centromere_start - 1)
@@ -52,12 +53,13 @@ load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_
         attr(mat_p, 'bad_columns') <- bad_colums_p
         attr(mat_q, 'bad_columns') <- bad_colums_q
 
-        return(list(p = mat_p, q = mat_q, 
-                    centromere = centromere_start:centromere_end,
-                    attr(mat_p, 'bad_columns'),
-                    attr(mat_q, 'bad_columns')))
+        return(list(p = mat_p, q = mat_q, centromere = centromere_start:centromere_end))
 
-    } else return(list(mat = mat[!bad_columns, !bad_columns],(which(bad_columns))))
+    } else {
+        mat <- mat[!bad_columns, !bad_columns]
+        attr(mat, 'bad_columns') <- names(which(bad_columns))
+        return(mat)
+    }
 }
 
 sparse_cor <- function(x) {
@@ -202,12 +204,9 @@ plot_borders <- function(tadpole, mat_file, centromere_search = FALSE) {
 
 TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, centromere_search = FALSE, hist_bad_columns = FALSE) {
     # Load and clean data.
-    mat_bc <- load_mat(mat_file, bad_frac = bad_frac, 
-                       centromere_search = centromere_search, 
-                       hist_bad_columns = hist_bad_columns)
+    mat <- load_mat(mat_file, bad_frac = bad_frac, centromere_search = centromere_search, hist_bad_columns = hist_bad_columns)
 
     if (centromere_search) {
-        mat <- mat_bc
         fixed_clusters_arms <- c()
         names_clusters_arms <- c()
         tadpole <- structure(list(), class = 'tadpole')
@@ -301,8 +300,7 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
         tadpole$merging_arms <- coord
 
     } else {
-        mat = mat_bc[[1]]
-        bad_columns = mat_bc[[2]]
+        bad_columns <- attr(mat, 'bad_columns')
 
         # Sparse matrix and correlation.
         correlation_matrix <- sparse_cor(mat)$cor
