@@ -25,7 +25,7 @@ load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_
     if (hist_bad_columns) hist(r, breaks = 50)
 
     message(paste(sum(bad_columns), 'bad columns found at position(s):'))
-    message(paste(attr(mat, 'bad_columns'), collapse = ' '))
+    message(paste(names(which(bad_columns)), collapse = ' '))
 
     if (centromere_search) {
         idx <- as.numeric(attr(mat, 'bad_columns'))
