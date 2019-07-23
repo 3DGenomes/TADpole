@@ -115,34 +115,32 @@ find_params <- function(pca, number_pca, min_clusters) {
 #' plot_dendro(tadpole)
 #' @export
 
-plot_dendro <- function(tadpole, centromere_search = FALSE) 
-{
-    if (centromere_search) {
-       dend_p <- as.dendrogram(tadpole$p$dendro)
+plot_dendro <- function(tadpole) {
+    if (length(names(tadpole)) == 2 && all.equal(names(tadpole), c('p', 'q'))) {
+        dend_p <- as.dendrogram(tadpole$p$dendro)
         hpk_p <- dendextend::heights_per_k.dendrogram(dend_p)
         
         dend_q <- as.dendrogram(tadpole$q$dendro)
         hpk_q <- dendextend::heights_per_k.dendrogram(dend_q)
-   
-        par(mfrow=c(2,1))
+        
+        layout(matrix(1:2))
         plot(cut(dend_p, h = hpk_p[tadpole$p$optimal_n_clusters])$upper,
-         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the p arm")
+             leaflab = 'none', main = 'Dendrogram of all levels validated by the Broken-Stick model in the p arm')
         rect.hclust(tadpole$p$dendro, k = tadpole$p$optimal_n_clusters)
         
         plot(cut(dend_q, h = hpk_q[tadpole$q$optimal_n_clusters])$upper,
-         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the q arm")
-        rect.hclust(tadpole$q$dendro, k = tadpole$q$optimal_n_clusters)}
-    
-    else {
-      dend <- as.dendrogram(tadpole$dendro)
-      hpk <- dendextend::heights_per_k.dendrogram(dend)
-      plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper,
-         leaflab = 'none',
-         main="Dendrogram of all levels validated by the Broken-Stick model")
-    # plot(cut(as.dendrogram(tadpole$dendro, hang = 10), h = tadpole$optimal_n_clusters)$upper, leaflab = 'none')
-    rect.hclust(tadpole$dendro, k = tadpole$optimal_n_clusters)}
-        
-
+             leaflab = 'none', main = 'Dendrogram of all levels validated by the Broken-Stick model in the q arm')
+        rect.hclust(tadpole$q$dendro, k = tadpole$q$optimal_n_clusters)
+        layout(1)
+    } else {
+        dend <- as.dendrogram(tadpole$dendro)
+        hpk <- dendextend::heights_per_k.dendrogram(dend)
+        plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper,
+             leaflab = 'none',
+             main = 'Dendrogram of all levels validated by the Broken-Stick model')
+        # plot(cut(as.dendrogram(tadpole$dendro, hang = 10), h = tadpole$optimal_n_clusters)$upper, leaflab = 'none')
+        rect.hclust(tadpole$dendro, k = tadpole$optimal_n_clusters)
+    }
 }
 
 #' Plot borders
@@ -156,21 +154,21 @@ plot_dendro <- function(tadpole, centromere_search = FALSE)
 #' plot_borders(tadpole, chromosome18_10Mb)
 #' @export
 
-plot_borders <- function(tadpole, mat_file, centromere_search = FALSE) {
+plot_borders <- function(tadpole, mat_file) {
     mat <- bigmemory::read.big.matrix(mat_file, type = 'double', sep = '\t')[, ]
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
     mat <- as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
     rownames(mat) <- 1:nrow(mat)
     colnames(mat) <- 1:ncol(mat)
-
-    if (centromere_search) {
+    
+    if (length(names(tadpole)) == 2 && all.equal(names(tadpole), c('p', 'q'))) {
         start_coord <- tadpole$merging_arms$start
         end_coord <- tadpole$merging_arms$end
     } else {
         start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$start
         end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$end
     }
-
+    
     colors <- colorRampPalette(c('white', 'firebrick3'))
     lattice::levelplot(as.matrix(log(mat)),
                        main=list('TAD Hierarchy',side=1,line=0.5),
