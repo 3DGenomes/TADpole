@@ -24,9 +24,8 @@ load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_
 
     if (hist_bad_columns) hist(r, breaks = 50)
 
-    attr(mat, 'bad_columns') <- names(which(bad_columns))
     message(paste(sum(bad_columns), 'bad columns found at position(s):'))
-    message(paste(attr(mat, 'bad_columns'), collapse = ' '))
+    message(paste(names(which(bad_columns)), collapse = ' '))
 
     if (centromere_search) {
         idx <- as.numeric(attr(mat, 'bad_columns'))
@@ -37,7 +36,9 @@ load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_
         message(paste('centromere position:', centromere_start, centromere_end))
         if (centromere_start == 1 || centromere_end == nrow(mat)) {
             message('longest stretch of bad rows/columns at the ends, not splitting the matrix.')
-            return(mat[!bad_columns, !bad_columns])
+            mat <- mat[!bad_columns, !bad_columns]
+            attr(mat, 'bad_columns') <- names(which(bad_columns))
+            return(mat)
         }
 
         idx_p <- 1:(centromere_start - 1)
@@ -52,12 +53,13 @@ load_mat <- function(mat_file, bad_frac = 0.01, centromere_search = FALSE, hist_
         attr(mat_p, 'bad_columns') <- bad_colums_p
         attr(mat_q, 'bad_columns') <- bad_colums_q
 
-        return(list(p = mat_p, q = mat_q, 
-                    centromere = centromere_start:centromere_end,
-                    attr(mat_p, 'bad_columns'),
-                    attr(mat_q, 'bad_columns')))
+        return(list(p = mat_p, q = mat_q, centromere = centromere_start:centromere_end))
 
-    } else return(list(mat = mat[!bad_columns, !bad_columns],(which(bad_columns))))
+    } else {
+        mat <- mat[!bad_columns, !bad_columns]
+        attr(mat, 'bad_columns') <- names(which(bad_columns))
+        return(mat)
+    }
 }
 
 sparse_cor <- function(x) {
@@ -113,34 +115,32 @@ find_params <- function(pca, number_pca, min_clusters) {
 #' plot_dendro(tadpole)
 #' @export
 
-plot_dendro <- function(tadpole, centromere_search = FALSE) 
-{
-    if (centromere_search) {
-       dend_p <- as.dendrogram(tadpole$p$dendro)
+plot_dendro <- function(tadpole) {
+    if (length(names(tadpole)) == 2 && all.equal(names(tadpole), c('p', 'q'))) {
+        dend_p <- as.dendrogram(tadpole$p$dendro)
         hpk_p <- dendextend::heights_per_k.dendrogram(dend_p)
         
         dend_q <- as.dendrogram(tadpole$q$dendro)
         hpk_q <- dendextend::heights_per_k.dendrogram(dend_q)
-   
-        par(mfrow=c(2,1))
+        
+        layout(matrix(1:2))
         plot(cut(dend_p, h = hpk_p[tadpole$p$optimal_n_clusters])$upper,
-         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the p arm")
+             leaflab = 'none', main = 'Dendrogram of all levels validated by the Broken-Stick model in the p arm')
         rect.hclust(tadpole$p$dendro, k = tadpole$p$optimal_n_clusters)
         
         plot(cut(dend_q, h = hpk_q[tadpole$q$optimal_n_clusters])$upper,
-         leaflab = 'none', main="Dendrogram of all levels validated by the Broken-Stick model in the q arm")
-        rect.hclust(tadpole$q$dendro, k = tadpole$q$optimal_n_clusters)}
-    
-    else {
-      dend <- as.dendrogram(tadpole$dendro)
-      hpk <- dendextend::heights_per_k.dendrogram(dend)
-      plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper,
-         leaflab = 'none',
-         main="Dendrogram of all levels validated by the Broken-Stick model")
-    # plot(cut(as.dendrogram(tadpole$dendro, hang = 10), h = tadpole$optimal_n_clusters)$upper, leaflab = 'none')
-    rect.hclust(tadpole$dendro, k = tadpole$optimal_n_clusters)}
-        
-
+             leaflab = 'none', main = 'Dendrogram of all levels validated by the Broken-Stick model in the q arm')
+        rect.hclust(tadpole$q$dendro, k = tadpole$q$optimal_n_clusters)
+        layout(1)
+    } else {
+        dend <- as.dendrogram(tadpole$dendro)
+        hpk <- dendextend::heights_per_k.dendrogram(dend)
+        plot(cut(dend, h = hpk[tadpole$optimal_n_clusters])$upper,
+             leaflab = 'none',
+             main = 'Dendrogram of all levels validated by the Broken-Stick model')
+        # plot(cut(as.dendrogram(tadpole$dendro, hang = 10), h = tadpole$optimal_n_clusters)$upper, leaflab = 'none')
+        rect.hclust(tadpole$dendro, k = tadpole$optimal_n_clusters)
+    }
 }
 
 #' Plot borders
@@ -154,21 +154,21 @@ plot_dendro <- function(tadpole, centromere_search = FALSE)
 #' plot_borders(tadpole, chromosome18_10Mb)
 #' @export
 
-plot_borders <- function(tadpole, mat_file, centromere_search = FALSE) {
+plot_borders <- function(tadpole, mat_file) {
     mat <- bigmemory::read.big.matrix(mat_file, type = 'double', sep = '\t')[, ]
     mat[is.na(mat)] <- 0 # Clean NA/NaN values.
     mat <- as.matrix(Matrix::forceSymmetric(mat, uplo = 'U'))
     rownames(mat) <- 1:nrow(mat)
     colnames(mat) <- 1:ncol(mat)
-
-    if (centromere_search) {
+    
+    if (length(names(tadpole)) == 2 && all.equal(names(tadpole), c('p', 'q'))) {
         start_coord <- tadpole$merging_arms$start
         end_coord <- tadpole$merging_arms$end
     } else {
         start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$start
         end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$end
     }
-
+    
     colors <- colorRampPalette(c('white', 'firebrick3'))
     lattice::levelplot(as.matrix(log(mat)),
                        main=list('TAD Hierarchy',side=1,line=0.5),
@@ -202,12 +202,9 @@ plot_borders <- function(tadpole, mat_file, centromere_search = FALSE) {
 
 TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, centromere_search = FALSE, hist_bad_columns = FALSE) {
     # Load and clean data.
-    mat_bc <- load_mat(mat_file, bad_frac = bad_frac, 
-                       centromere_search = centromere_search, 
-                       hist_bad_columns = hist_bad_columns)
+    mat <- load_mat(mat_file, bad_frac = bad_frac, centromere_search = centromere_search, hist_bad_columns = hist_bad_columns)
 
     if (centromere_search) {
-        mat <- mat_bc
         fixed_clusters_arms <- c()
         names_clusters_arms <- c()
         tadpole <- structure(list(), class = 'tadpole')
@@ -301,8 +298,7 @@ TADpole <- function(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01, 
         tadpole$merging_arms <- coord
 
     } else {
-        mat = mat_bc[[1]]
-        bad_columns = mat_bc[[2]]
+        bad_columns <- attr(mat, 'bad_columns')
 
         # Sparse matrix and correlation.
         correlation_matrix <- sparse_cor(mat)$cor
