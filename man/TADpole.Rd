@@ -4,8 +4,17 @@
 \alias{TADpole}
 \title{Call hierarchical TADs}
 \usage{
-TADpole(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01,
-  centromere_search = FALSE, hist_bad_columns = FALSE)
+TADpole(
+  mat_file,
+  max_pcs = 200,
+  min_clusters = 2,
+  bad_frac = 0.01,
+  chr,
+  start,
+  end,
+  resol,
+  centromere_search = FALSE
+)
 }
 \arguments{
 \item{mat_file}{path to the input file. Must be in a tab-delimited matrix format.}
@@ -16,9 +25,15 @@ TADpole(mat_file, max_pcs = 200, min_clusters = 2, bad_frac = 0.01,
 
 \item{bad_frac}{fraction of the matrix to falg as bad rows/columns.}
 
-\item{centromere_search}{split the matrix by the centrormere into two smaller matrices representing the chromosomal arms. Useful when woring with big (>15000 bins) datasets.}
+\item{chr}{string with the chromosome name.}
 
-\item{hist_bad_columns}{plot the distribution of row/column coverage to help in selecting a useful value for `bad_frac`. Mostly for debugging.}
+\item{start}{numeric start position of the region or of the chromosome.}
+
+\item{end}{numeric end position of the region or of the chromosome.}
+
+\item{resol}{numeric resolution/binning of the Hi-C experiment.}
+
+\item{centromere_search}{split the matrix by the centrormere into two smaller matrices representing the chromosomal arms. Useful when woring with big (>15000 bins) datasets.}
 }
 \value{
 `tadpole` object that defines the clustering of genomic regions.
@@ -33,6 +48,6 @@ It will do so regardless of whether this stretch represents a true centromere or
 but be cautious of interpreting the partitions as the two chromosomal arms (p and q) when working with smaller regions.
 }
 \examples{
-chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
-tadpole <- TADpole(chromosome18_10Mb)
+mat_file <- system.file("inst/extdata", "raw_chr18:460-606_20kb.tsv", package = "TADpole")
+tadpole <- TADpole(mat_file, chr = "chr18", start = 496, end = 606, resol = 20000)
 }

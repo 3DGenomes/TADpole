@@ -4,22 +4,35 @@
 \alias{load_mat}
 \title{Load a Hi-C matrix from a file}
 \usage{
-load_mat(mat_file, bad_frac = 0.01, centromere_search = FALSE,
-  hist_bad_columns = FALSE)
+load_mat(
+  mat_file,
+  chr,
+  start,
+  end,
+  resol,
+  bad_frac = 0.01,
+  centromere_search = FALSE
+)
 }
 \arguments{
 \item{mat_file}{path to the input file. Must be in a tab-delimited matrix format.}
 
+\item{chr}{string with the chromosome name.}
+
+\item{start}{numeric start position of the region or of the chromosome.}
+
+\item{end}{numeric end position of the region or of the chromosome.}
+
+\item{resol}{numeric resolution/binning of the Hi-C experiment.}
+
 \item{bad_frac}{fraction of the matrix to falg as bad rows/columns.}
 
 \item{centromere_search}{split the matrix by the centrormere into two, smaller matrices representing the chromosomal arms. Useful when working with big (>15000 bins) datasets.}
-
-\item{hist_bad_columns}{plot the distribution of row/column coverage to help in selecting a useful value for `bad_frac`. Mostly for debugging.}
 }
 \description{
 Load a Hi-C matrix from a file
 }
 \examples{
-chromosome18_10Mb <- system.file("extdata", "chromosome18_10Mb.tsv", package = "TADpole")
-mat <- load_mat(chromosome18_10Mb)
+mat_file <- system.file("extdata", "raw_chr18:460-606_20kb.tsv", package = "TADpole")
+mat <- load_mat(mat_file, chr = "chr18", start = 496, end = 606, resol = 20000)
 }

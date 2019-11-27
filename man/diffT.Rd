@@ -13,7 +13,7 @@ diffT(bed_x, bed_y)
 Compute diffT score between two TAD calls
 }
 \examples{
-control <- system.file("extdata", "control.bed", package = "TADpole")
-case <- system.file("extdata", "case.bed", package = "TADpole")
+control <- read.table(system.file("extdata", "control.bed", package = "TADpole"))
+case <- read.table(system.file("extdata", "case.bed", package = "TADpole"))
 difft_control_case <- diffT(control, case)
 }
