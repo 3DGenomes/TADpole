@@ -182,7 +182,7 @@ plot_hierarchy <- function(mat_file, tadpole, chr, start, end, resol, centromere
                    xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
                    panel = function(...) {
                        lattice::panel.levelplot(...)
-                       for (i in seq(length(tadpole$clusters))){
+                       for (i in seq(max(as.numeric(names(tadpole$clusters))))){
                        lattice::panel.points(tadpole$clusters[[as.character(i)]]$start - 0.5,
                                              tadpole$clusters[[as.character(i)]]$end + 0.5,
                                              col="black",
@@ -204,7 +204,7 @@ plot_hierarchy <- function(mat_file, tadpole, chr, start, end, resol, centromere
                          "____ Optimal partition             .... Significant partitions"),
                  colour = "#80404080", size = 10,x = 0.7, y = 1)
     } else {
-        cut <- length(tadpole$clusters)    # Number of clusters
+        cut <- max(as.numeric(names(tadpole$clusters)))    # Number of clusters
         dendr <- ggdendro::dendro_data(tadpole$dendro, type="rectangle")
         clust <- cutree(tadpole$dendro, k = cut)               # find 'cut' clusters
         clust.df <- data.frame(label = names(clust), cluster = clust)
