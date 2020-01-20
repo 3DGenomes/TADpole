@@ -32,6 +32,8 @@ install.packages(c('bigmemory', 'cowplot', 'doParallel', 'foreach', 'fpc',
                    'plyr', 'reshape2', 'rioja', 'viridis', 'zoo'))
 ```
 
+Please note that TADpole has been tested to work with R versions since 3.5.2.
+
 - Then, get the latest version of the source code from Github
 
 by using _wget_:
