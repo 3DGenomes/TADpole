@@ -172,7 +172,7 @@ plot_hierarchy(mat_file, tadpole, chr = "chr18", start = 9000000, end = 15000000
 - **centromere_search**: `logical`. Split the matrix by the centromere into two sub-matrices representing the chromosome arms. Useful when working with big matrices (>15000 bins).
 
 <p align="center">
-<img src="https://github.com/paulasoler/TADpole/blob/master/misc/Figure3_1.png" width="70%">
+<img src="https://github.com/paulasoler/TADpole/blob/master/misc/Figure3_2.png" width="70%">
 </p>
 
 #### 3.1.3) Matrix of Calinski-Harabasz indices
