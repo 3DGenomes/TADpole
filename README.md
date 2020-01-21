@@ -62,7 +62,7 @@ Note: if you download the zip file from the GitHub website instead, it will be n
 
 In this repository, we provide a test case from a publicly available Hi-C data set (SRA: [SRR1658572](https://www.ebi.ac.uk/ena/data/view/SRR1658572)) (1).
 
-In the `inst/extdata/` directory, we provided a 3 Mb region (chr18:9,200,000-12,200,000) of a human Hi-C dataset at 30kb resolution. 
+In the `inst/extdata/` directory, we provided a 6 Mb region (chr18:9,000,000-15,000,000) of a human Hi-C dataset at 30kb resolution. 
 
 ```
 inst/extdata/raw_chr18_300_500_30kb.tsv
