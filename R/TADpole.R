@@ -168,29 +168,52 @@ plot_hierarchy <- function(mat_file, tadpole, chr, start, end, resol, centromere
     if (centromere_search) {
         start_coord <- tadpole$merging_arms$start
         end_coord <- tadpole$merging_arms$end
+        
+         matrix_partition <- lattice::levelplot(as.matrix(log(mat)),
+              # main=list('Hierarchical chromatin organization\nchr18:9,200,000-12,130,000',side=1,line=0.5),
+              # sub= paste0("Optimal number of PCs:",as.character(tadpole$n_pcs),"       ",
+               #            "Optimal number of clusters:",as.character(tadpole$optimal_n_clusters),"\n",
+                #           "____ Optimal partition             .... Significant partitions"),
+               col.regions = colors, scales = list(draw = FALSE), colorkey = TRUE,
+               xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
+               panel = function(...) {
+                   lattice::panel.levelplot(...)
+
+                   for (i in seq(max(as.numeric(nrow(tadpole$merging_arms))))){
+                   lattice::panel.points(tadpole$merging_arms[[as.character(i)]]$start - 0.5,
+                                         tadpole$merging_arms[[as.character(i)]]$end + 0.5,
+                                         col="black",
+                                         type="s", cex=4, lty="dashed")}
+                   lattice::panel.points(start_coord - 0.5,
+                                         end_coord + 0.5,
+                                         col="blue",
+                                         type="s", cex=4)})
+        
+        
     } else {
         start_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$start
         end_coord <- tadpole$clusters[[as.character(tadpole$optimal_n_clusters)]]$end
+        
+        matrix_partition <- lattice::levelplot(as.matrix(log(mat)),
+              # main=list('Hierarchical chromatin organization\nchr18:9,200,000-12,130,000',side=1,line=0.5),
+              # sub= paste0("Optimal number of PCs:",as.character(tadpole$n_pcs),"       ",
+               #            "Optimal number of clusters:",as.character(tadpole$optimal_n_clusters),"\n",
+                #           "____ Optimal partition             .... Significant partitions"),
+               col.regions = colors, scales = list(draw = FALSE), colorkey = TRUE,
+               xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
+               panel = function(...) {
+                   lattice::panel.levelplot(...)
+                   for (i in seq(max(as.numeric(names(tadpole$clusters))))){
+                   lattice::panel.points(tadpole$clusters[[as.character(i)]]$start - 0.5,
+                                         tadpole$clusters[[as.character(i)]]$end + 0.5,
+                                         col="black",
+                                         type="s", cex=4, lty="dashed")}
+                   lattice::panel.points(start_coord - 0.5,
+                                         end_coord + 0.5,
+                                         col="blue",
+                                         type="s", cex=4)})
     }
 
-    matrix_partition <- lattice::levelplot(as.matrix(log(mat)),
-                  # main=list('Hierarchical chromatin organization\nchr18:9,200,000-12,130,000',side=1,line=0.5),
-                  # sub= paste0("Optimal number of PCs:",as.character(tadpole$n_pcs),"       ",
-                   #            "Optimal number of clusters:",as.character(tadpole$optimal_n_clusters),"\n",
-                    #           "____ Optimal partition             .... Significant partitions"),
-                   col.regions = colors, scales = list(draw = FALSE), colorkey = TRUE,
-                   xlab = NULL, ylab = NULL, par.settings = list(axis.line = list(col = 'black')),
-                   panel = function(...) {
-                       lattice::panel.levelplot(...)
-                       for (i in seq(max(as.numeric(names(tadpole$clusters))))){
-                       lattice::panel.points(tadpole$clusters[[as.character(i)]]$start - 0.5,
-                                             tadpole$clusters[[as.character(i)]]$end + 0.5,
-                                             col="black",
-                                             type="s", cex=4, lty="dashed")}
-                       lattice::panel.points(start_coord - 0.5,
-                                             end_coord + 0.5,
-                                             col="blue",
-                                             type="s", cex=4)})
 
     if (centromere_search) {
       ggdraw(xlim = c(0, 1.3), ylim = c(0, 1.3)) +
